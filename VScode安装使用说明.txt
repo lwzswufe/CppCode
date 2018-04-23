@@ -1,3 +1,7 @@
-1, 安装C/C++,C/C++ Clang Command Adapter, C++ intellisense, Code Runner等四个应用
+﻿1, 安装C/C++,C/C++ Clang Command Adapter, C++ intellisense, Code Runner等四个应用
 2, 拷贝配置文件
 3，安装编译器（x86_64-7.20-MinGW）
+4，安装Clang for Windows (64-bit)  安装目录 C:\LLVM\
+5, 合并MinGW子文件夹与LLVM子文件夹（两个子文件夹都包含bin）合并后约1.51GB
+6, 指定安装目录为 C:\LLVM\bin   
+7, 删除MinGW64
