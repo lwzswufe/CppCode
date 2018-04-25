@@ -23,7 +23,7 @@ int main()
 	*p1 *= *p1;       // equivalent to i *= i
 	cout << "i  = " << i << endl;
 
-    int *p0 = nullptr;
+    int *p0 = nullptr; // 等效于*p0 = 0
     cout << "empty pointer address" << p0 << endl;
 
 	return 0;

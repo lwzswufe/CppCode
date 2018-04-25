@@ -19,7 +19,10 @@ int main()
 	cout << '\115' << '\n' << '\a'; //\115转义字符  M的ascii码=115
 	Beep(494, 200);         // 输出声音 需要#include<windows.h> Beep（频率，持续时间）；
 
-	int f = {3};
+	int f = {3};            // f = {3} 与 f{3}等效 使用{}不会自动转换数字类型
 	cout << f << endl;
+
+	extern int j;           // 声明j  声明变量后不要初始化 一个变量只能定义一次 但可以声明多次
+
 	return 0;
 }
