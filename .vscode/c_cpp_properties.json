@@ -1,19 +1,44 @@
 {
-    "name": "Win32",
-    "includePath": [
-        "${workspaceFolder}"
+    "configurations": [
+        {
+            "name": "MinGW",
+            "includePath": [
+                "${workspaceFolder}",
+                "C:\\LLVM",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0",
+                "C:\\LLVM\\x86_64-w64-mingw32\\include\\",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\bits",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\backward",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\x86_64-w64-mingw32",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\x86_64-w64-mingw32\\bits",
+                "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include-fixed"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE"
+            ],
+            "compilerPath": "C:\\LLVM\\bin\\gcc.exe",
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "C:\\LLVM",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0",
+                    "C:\\LLVM\\x86_64-w64-mingw32\\include\\",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\bits",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\backward",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\x86_64-w64-mingw32",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++\\x86_64-w64-mingw32\\bits",
+                    "C:\\LLVM\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include-fixed",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
     ],
-    "defines": [
-        "_DEBUG",
-        "UNICODE"
-    ],
-    "intelliSenseMode": "msvc-x64",
-    "browse": {
-        "path": [
-            "${workspaceFolder}",
-            "C:\\MinGW\\lib\\gcc\\x86_64-w64-mingw32\\7.2.0\\include\\c++"
-        ],
-        "limitSymbolsToIncludedHeaders": true,
-        "databaseFilename": ""
-    }
+    "version": 3
 }

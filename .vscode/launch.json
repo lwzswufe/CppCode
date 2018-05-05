@@ -14,7 +14,8 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true
+            "externalConsole": true,    
+            "miDebuggerPath": "C:\\LLVM\\bin\\gdb.exe"
         }
     ]
 }

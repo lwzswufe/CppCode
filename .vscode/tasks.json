@@ -2,11 +2,32 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build hello world",
+            "label": "build",
             "type": "shell",
-            "command": "g++",
+            "command": "gcc",
+            "windows": {
+                "args": [
+                    "${fileDirname}/${fileBasenameNoExtension}.exe"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "${fileDirname}/${fileBasenameNoExtension}.o"
+                ]
+            },
+            "osx": {
+                "args": [
+                    "${fileDirname}/${fileBasenameNoExtension}.o"
+                ]
+            },
             "args": [
-                "-g", "helloworld.cpp"
+                "-g", 
+                "-Wall",
+                "-std=c++11",
+                "-lm",
+                "${file}",
+                "${file}.exe",
+                "-o"
             ]
         }
     ]
