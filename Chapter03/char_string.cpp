@@ -28,9 +28,11 @@ int main()
 {    
     string str_1 = "dahdaho", str_2, str_3;
 
-    char char_1[20], char_2[20];
+    char char_1[20], char_2[20], char_3[20];
 
-    const char* char_ptr, char_ptr2;
+    const char* char_ptr;
+
+    char* char_ptr2;
 
     cout << "string to char[]" << endl;
     strcpy(char_1, str_1.c_str());
@@ -49,7 +51,7 @@ int main()
 
     cout << char_ptr << endl;
 
-    cout << "const char* to char []" << endl;
+    cout << "const char* to char[]" << endl;
     strcpy(char_2, char_ptr);
 
     cout << char_2 << endl;
@@ -58,5 +60,6 @@ int main()
     str_3 = char_ptr;
     cout << str_3 << endl;
 
+    // strcpy(char_ptr2, char_2);  // gei char* 赋值容易产生溢出错误
     return 0;
 }

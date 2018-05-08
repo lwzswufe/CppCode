@@ -12,9 +12,13 @@ int main()
 {   
     Vector v1(5.1, 6);
     v1.show();
-    cout << v1 << endl;
+
     Vector v2(3);
     v2.show();
+    
+    Vector v3;  // 定义了默认构造函数才能使用这种初始化方法
+
+    cout << v1 << endl;
     //v2.dim;
 
     return 0;
