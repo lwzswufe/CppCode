@@ -10,6 +10,7 @@ int main()
 	string s1  = "hello, ", s2 = "world\n";
 	string s3 = s1 + s2;   // s3 is hello, world\n
 	cout << s1 << s2 << s3 << endl;
+	cout << s3.length() << endl;
 
 	s1 += s2;   // equivalent to s1 = s1 + s2
 	cout << s1;
