@@ -5,3 +5,6 @@
 5, 合并MinGW子文件夹与LLVM子文件夹（两个子文件夹都包含bin）合并后约1.51GB
 6, 指定安装目录为 C:\LLVM\bin   
 7, 删除MinGW64
+8, 配置c_cpp_properties.json 参照
+    https://github.com/Microsoft/vscode-cpptools/blob/master/Documentation/LanguageServer/MinGW.md
+    
