@@ -48,6 +48,19 @@ void readlines_while(auto read_fn, vector<string> &vector_string)
     input.close();
 }
 
+void readword_while(auto read_fn)
+{   
+    ifstream input;                         // 定义读取类
+    input.open(read_fn);                    // 打开文件
+    string word;
+    cout << "read_word" << endl;
+    while(input >> word && !input.eof())    // 按照制表符 空格自动拆分
+    {   
+        cout << "read:      " << word         << endl;
+    }
+}
+
+
 int main()
 {   
     vector<string> vector_1, vector_2;
@@ -58,6 +71,7 @@ int main()
     readlines_for(read_fn_2, vector_2);
 
     readlines_while(read_fn_1, vector_1);
+    readword_while(read_fn_1);
 
     for (auto s : vector_1)
     {
