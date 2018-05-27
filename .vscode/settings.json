@@ -33,6 +33,21 @@
         "xstddef": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cwctype": "cpp",
+        "string_view": "cpp",
+        "fstream": "cpp",
+        "sstream": "cpp",
+        "vector": "cpp",
+        "algorithm": "cpp",
+        "numeric": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "optional": "cpp",
+        "tuple": "cpp"
     }
 }
