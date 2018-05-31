@@ -35,6 +35,8 @@ public:
 
 	~HasPtr();
 
+	void print()
+	{ cout << "value: " << *ps << " use: " << *use << endl;};
 							// move constructor takes over the pointers from its argument
 							// and makes the argument safe to delete
 	HasPtr(HasPtr &&p): ps(p.ps), i(p.i), use(p.use) 
@@ -54,30 +56,33 @@ private:
 HasPtr::~HasPtr()			// 析构函数
 {	
 	cout << "回收对象 递减引用计数 " << *use << endl;
-	if (--*use == 0) 			// if the reference count goes to 0
+	if (--*use == 0) 		// if the reference count goes to 0
 	{  	
-		cout << *use << endl;
+		//cout << *ps << endl;
 		show();
 		cout << "reference is 0 delete the string" << endl;
-		delete ps;       	// delete the string
-		delete use;      	// and the counter
+		//delete ps;       	// delete the string
+		//delete use;      	// and the counter
 	}
 }
 
 HasPtr &
 HasPtr::operator=(HasPtr &&rhs)
 {
-	if (this != &rhs) 
+	if (this != &rhs) 		// 函数完成析构临时变量-赋值返回变量时会调用这个函数
 	{
-		if (--*use == 0) 
+		if (--*use == 0) 	// 递减临时变量引用次数
 		{   				// do the work of the destructor
+			cout << *use;	// 删除临时变量
+			cout << " delete object" << endl;
 			delete ps;
 			delete use;
 		}
 		show();
-		cout << "赋值运算符" << endl;
+		cout << "赋值运算符__函数返回" << endl;
 		ps = rhs.ps;         // do the work of the move constructor
 		i = rhs.i;
+		++*rhs.use;
 		use = rhs.use;
 		ps = 0; 
 		use = 0;
@@ -86,13 +91,14 @@ HasPtr::operator=(HasPtr &&rhs)
 }
 
 HasPtr& HasPtr::operator=(const HasPtr &rhs) 
-{
+{							// 递增右值对象引用次数
 	++*rhs.use;  			// increment the use count of the right-hand operand
-	if (--*use == 0) 
-	{   					// then decrement this object's counter
+	if (--*use == 0) 		// 递减左值对象引用次数
+	{   cout << *use;		// then decrement this object's counter
+		cout << " delete object const" << endl;
 		delete ps;       	// if no other users 
 		delete use;      	// free this object's allocated members
-	}
+	}						// 删除对象 释放内存
 	ps = rhs.ps;         	// copy data from rhs into this object
 	i = rhs.i;
 	use = rhs.use; 
@@ -101,8 +107,9 @@ HasPtr& HasPtr::operator=(const HasPtr &rhs)
 	return *this;        	// return this object
 }
 
-HasPtr f(HasPtr hp) 		// HasPtr passed by value, so it is copied
+HasPtr f(const HasPtr &hp) 		// HasPtr passed by value, so it is copied
 {	
+	cout << "function f" << endl;
 	cout << "HasPtr ret" << endl;
 	HasPtr ret;
 	cout << "ret = hp" << endl;
@@ -127,8 +134,12 @@ int main()
 	cout << "h2 = h" << endl;
 	h3 = h2;
 	cout << "HasPtr h4(h2)" << endl;
-	HasPtr h4(h2);  
-	// h5 = f(h);
+	HasPtr h4(h2), h5;  
+	cout << "h5 = f(h);" << endl;
+	h.print();
+	h5 = f(h);
+	//h.print();
+	h5.print();
 	cout << "end main" << endl; 
 } 
 
