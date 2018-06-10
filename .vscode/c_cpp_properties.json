@@ -10,7 +10,7 @@
                 "_DEBUG",
                 "UNICODE"
             ],
-            "compilerPath": "C:\\LLVM\\bin\\g++.exe",
+            "compilerPath": "C:\\LLVM\\bin\\gcc.exe",
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
