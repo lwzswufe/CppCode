@@ -1,11 +1,12 @@
-#include <iostream>
-using std::cout; using std::endl; using std::ostream;
+// #include <iostream>
+// using std::cout; using std::endl; using std::ostream;
 
-#include <string>
-using std::string;
+// #include <string>
+// using std::string;
 
-#include <stdio.h>
+// #include <cstdio>
 
+// 因为头文件vector1.h 已经include 了这些模块 所以在本文件中不用再次include
 #include "vector1.h"
 
 int main()
