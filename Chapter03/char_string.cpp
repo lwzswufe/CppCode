@@ -43,8 +43,9 @@ int main()
     str_2 = char_1;
 
     str_2 += "_2";
+    string str_4 {char_1, char_1 + 6};      // 截取char[]
 
-    cout << str_2 << endl;
+    cout << str_2 << ", " << str_4 << endl;
 
     cout << "string to const char*" << endl;
     char_ptr = str_2.data();
