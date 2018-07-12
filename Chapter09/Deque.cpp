@@ -5,7 +5,7 @@ using std::deque;
 #include <iostream>
 using std::cerr; using std::cout; using std::endl; using std::ends;
 
-void print(deque<auto> v)      // 输出字符串
+void print(deque<int> v)      // 输出字符串
 {   
     cout << "deque: ";
     for(auto iter : v)

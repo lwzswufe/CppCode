@@ -18,10 +18,16 @@ using std::chrono::steady_clock;                // 硬件时间
 using std::chrono::time_point;
 using std::chrono::microseconds;
 
+#include <deque>
+using std::deque;
 
-mutex cout_mutex;
-recursive_mutex cout_mutex_r;
-string global_s;
+#include <windows.h>                            // 引入sleep
+
+mutex cout_mutex;                               // 锁 互斥量
+recursive_mutex cout_mutex_r;                   // 可使用 try_lock的互斥量
+string global_s;    
+deque<string> task_deque{};                     // 任务队列
+
 
 void task()
 {   
@@ -37,21 +43,26 @@ void task()
 
 void task_r()
 {   
+    string word;
     cout << "sub_thread start...\n" << endl;
-    string past_word;
-    this_thread::sleep_for(microseconds{10}); 
+    //this_thread::sleep_for(microseconds{10}); 
     while(true)
     {   
-        this_thread::sleep_for(microseconds{8}); 
+        this_thread::sleep_for(microseconds{1}); 
         if (cout_mutex_r.try_lock())
         {   
-            if (past_word != global_s)
+            if (task_deque.size() > 0)
             {
-                cout << global_s << endl;
-                past_word = global_s;
+                word = task_deque.front();
+                task_deque.pop_front();
+                cout << word;
+            }
+            else
+            {
+                word = "empty";
             }
             cout_mutex_r.unlock();
-            if (global_s == "stop")
+            if (word == "stop")                 // 终止子进程
             {
                 cout << "sub thread end" << endl;
                 break;
@@ -59,14 +70,6 @@ void task_r()
         }  
     }
 
-}
-
-void task_(int num)
-{   // 一个需要大量计算的任务
-    for (int i=0; i<1000000; i++)
-    {
-        int j = 1;
-    }
 }
 
 int main()
@@ -89,24 +92,23 @@ int main()
     cout << "main start...\n";
     thread t_2{task_r};
 
-    task_(123456);
 
     char s[20];
-    int ii = 0;
-    string past_word;
     cout << "for start...\n";
-    for (int i=0; i<3; i++)
-    {
-        task_(123456);
-        ii++;
+    for (int i=0; i<10; i++)
+    {   
+        Sleep(1);
         cout_mutex_r.lock();
-        sprintf_s(s,"word_%d\n", ii);
-        global_s = s;
+        sprintf_s(s,"word_%d\n", i);
+        task_deque.push_back(s);
         cout_mutex_r.unlock();
     }
 
+    cout << "for loop end\n";
+
     cout_mutex_r.lock();
-    global_s = "stop";
+
+    task_deque.push_back("stop");
     cout_mutex_r.unlock();
 
     t_2.join();
