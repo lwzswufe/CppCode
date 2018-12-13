@@ -36,5 +36,10 @@ int main()
             cout << "phone: " << phone << endl;
         } 
     }
+    istringstream str_in2("drew 9735550130\n"); 
+    string A, B, C;
+    str_in2 >> A >> B >> C;                     // 若C匹配到任何字符串 C会重置为空字符串
+    cout << "A:" << A << ", B:" << B << ", C:" << C << endl;
+    cout << C.size() << endl;
     return 0;
 }
