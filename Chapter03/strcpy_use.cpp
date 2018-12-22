@@ -24,6 +24,6 @@ int main()
     printf_s("strp: %s\nstr4: %s\n\n", str_p, str4);
     
     strcpy_s(str5, 40, str_p);        // 不可直接使用    strcpy_s(str5, str_p) 40用于指明str5的大小
-    printf_s("strp: %s\nstr4: %s\n\n", str_p, str5);
+    printf_s("strp: %s\nstr5: %s\n\n", str_p, str5);
     return 0;
 }
