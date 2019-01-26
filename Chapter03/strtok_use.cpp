@@ -24,10 +24,20 @@ int main ()
 
     token = strtok_s(str2, Delimit, &next_token);
     
+    char str3[] = "09:33:18.7450\t300484\t13.430000\t13.550000\t1\t1\t14\t3";
+    const char seq[]{"\t"};
+    char *s;
+    s = str3;
+    token = NULL;
+    next_token = NULL; 
+    token = strtok_s(s, seq, &next_token);
+    printf("token0:%s\n", token);
+    s = next_token;
+    token = strtok_s(s, seq, &next_token);
     while (token != NULL)
     {
-        printf ("%s\n", token);
-        token = strtok_s(NULL, Delimit, &next_token);
+        printf ("token:%s\n", token);
+        token = strtok_s(NULL, seq, &next_token);
     }
 
     printf (">>>>>>>>>%s>>>>>>>\n", "strtok_s end");
