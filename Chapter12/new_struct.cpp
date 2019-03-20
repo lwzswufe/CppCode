@@ -12,7 +12,6 @@ int main()
 {
     Stock * pstock = new Stock;
     std::cout << "size: " << sizeof(Stock) << endl;
-    Stock * pp = pstock;
     strcpy_s(pstock->code, "600000");
     pstock->market = 1;
     pstock->price = 123;
