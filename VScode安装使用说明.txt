@@ -7,4 +7,14 @@
 7, 删除MinGW64
 8, 配置c_cpp_properties.json 参照
     https://github.com/Microsoft/vscode-cpptools/blob/master/Documentation/LanguageServer/MinGW.md
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+linux 下 设置
+    "code-runner.executorMap":
+    {
+        "cpp": "cd $dir && clang++ $fileName -o $fileNameWithoutExt -std=c++11 && $dir$fileNameWithoutExt",
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.ignoreSelection": true,
+    "code-runner.saveFileBeforeRun": true
+
     
