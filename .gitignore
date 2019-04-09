@@ -1,2 +1,5 @@
-
+/.vscode/ipch/
+/Cmake/build/
+/Cmake_Use/build/
+*.a
 *.exe

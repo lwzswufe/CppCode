@@ -1,6 +1,4 @@
-
-#include <iostream>
-using std::cout; using std::endl;
+#include <stdio.h> 
 
 #include <unistd.h>
 #include <pthread.h>
@@ -8,14 +6,11 @@ using std::cout; using std::endl;
 #include <string>
 using std::string;
 
-#include <chrono>
-using std::chrono::steady_clock;                // 硬件时间
-using std::chrono::time_point;
-using std::chrono::microseconds;
+#include <sys/time.h>
 
 /*
 pthread库不是Linux系统默认的库，连接时需要使用静态库libpthread.a，所以在线程函数在编译时，
-需要连接库函数，如上图    gcc Multi_Thread_2.cpp -o Multi_Thread_2 -lpthread
+需要连接库函数，如上图    g++ Multi_Thread_2.cpp -o Multi_Thread_2 -lpthread
 
 原型：int  pthread_create（（pthread_t  *thread,  pthread_attr_t  *attr,  void  *（*start_routine）（void  *）,  void  *arg）
 用法：#include  <pthread.h>
@@ -34,15 +29,29 @@ attr(属性结构)为pthread_attr_t，它同样在头文件/usr/include/pthread.
 
 */
 // 子线程任务函数
-void *task(steady_clock::time_point main_st)
+double GetTime() 
+{   // 获取精确到毫秒的时间
+    struct timeval    tv; 
+    struct timezone   tz; 
+    struct tm         *p; 
+       
+    gettimeofday(&tv, &tz); 
+       
+    p = localtime(&tv.tv_sec); 
+    double now = p->tm_hour * 10000 + p->tm_min * 60 + 
+                 p->tm_sec + tv.tv_usec / 1000000.0; 
+    return now;
+} 
+
+void *task(void* args)
 {   
-    steady_clock::time_point task_st = steady_clock::now();
-    steady_clock::duration st_time = task_st - main_st;
     pthread_t pid = pthread_self();
-    char s[256];
-    sprintf(s,"thread %lu start after %ld ns \n", pid, st_time.count());
-    cout << s;
-    printf("thread %lu exit\n", pid);
+    double task_st = GetTime();
+    long sleep_usec = (pid % 10) * 1000;
+    usleep(sleep_usec);
+    double task_ed = GetTime();
+    printf("thread %lu start:%.3lf end:%.3lf used:%.3lfs\n", 
+            pid, task_st, task_ed, task_ed - task_st);
     pthread_exit(0);
 }
 
@@ -50,19 +59,25 @@ void *task(steady_clock::time_point main_st)
 
 int main()
 {   
-    steady_clock::time_point main_st = steady_clock::now();
-    pthread_t pid_1;                                                  //pthread_t多线程标识符
-    int ret = pthread_create(&pid_1, NULL, task, &main_st);         // 获取线程编号
+    double main_st = GetTime();
+    pthread_t pid_1, pid_2;       // pthread_t多线程标识符
+    int ret;
+    ret = pthread_create(&pid_1, NULL, task, NULL);         
     if(ret!=0)
     {
-        printf("Create pthread error!\n");
+        printf("Create pthread1 error!\n");
         return -1;
     }
-    pthread_join(pid_1, NULL);    // 主线程阻塞等待子线程1结束
-    //pthread_join(pid_2, NULL);     // 主线程阻塞等待子线程2结束
+    ret = pthread_create(&pid_2, NULL, task, NULL);        
+    if(ret!=0)
+    {
+        printf("Create pthread2 error!\n");
+        return -1;
+    }
+    pthread_join(pid_1, NULL);     // 主线程阻塞等待子线程1结束
+    pthread_join(pid_2, NULL);     // 主线程阻塞等待子线程2结束
 
-    steady_clock::duration use_time = steady_clock::now() - main_st;
-    char s[50];
-    sprintf(s,"main end after %ld ns \n", use_time.count());
-    cout << s;
+    double main_ed = GetTime();
+    printf("main     start:%.3lf end:%.3lf used:%.3lfs\n"
+            , main_st, main_ed, main_ed - main_st);
 }
