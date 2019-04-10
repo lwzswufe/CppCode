@@ -2,32 +2,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build windows",
             "type": "shell",
-            "command": "gcc",
-            "windows": {
-                "args": [
-                    "${fileDirname}/${fileBasenameNoExtension}.exe"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "${fileDirname}/${fileBasenameNoExtension}.o"
-                ]
-            },
-            "osx": {
-                "args": [
-                    "${fileDirname}/${fileBasenameNoExtension}.o"
-                ]
-            },
+            "command": "C:\\LLVM\\bin\\g++.exe",
             "args": [
-                "-g", 
-                "-Wall",
-                "-std=c++11",
-                "-lm",
-                "${file}",
-                "${file}.exe",
-                "-o"
+                    "-g",
+                    "-Wall",
+                    "-std=c++11",
+                    "-lm",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}.exe"
+                ],
+            "problemMatcher": [
+                "$gcc"
             ]
         }
     ]
