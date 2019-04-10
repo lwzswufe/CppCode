@@ -5,10 +5,31 @@
     // 在 "preLaunchTask": 这里输入 task.json里对应的c++编译(build)任务的名称("label")
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "(gdb) Linux Launch",
+            "preLaunchTask": "Build Linux",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}.o",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
 
         {
             "name": "(gdb) Windows Launch",
-            "preLaunchTask": "build windows",
+            "preLaunchTask": "Build Windows",
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}.exe",

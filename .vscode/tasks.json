@@ -2,7 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build windows",
+            "label": "Build Linux",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                    "-g",
+                    "-Wall",
+                    "-std=c++11",
+                    "-lm",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}.o"
+                ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build Windows",
             "type": "shell",
             "command": "C:\\LLVM\\bin\\g++.exe",
             "args": [
