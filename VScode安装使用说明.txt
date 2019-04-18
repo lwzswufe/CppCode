@@ -1,4 +1,4 @@
-﻿1, 安装C/C++,C/C++ Clang Command Adapter, C++ intellisense, Code Runner等四个应用
+﻿1, 安装C/C++,C/C++ Clang Command Adapter, C++ intellisense, Code Runner， guides等五个应用
 2, 拷贝配置文件
 3，安装编译器（x86_64-7.20-MinGW）
 4，安装Clang for Windows (64-bit)  安装目录 C:\LLVM\
@@ -7,6 +7,8 @@
 7, 删除MinGW64
 8, 配置c_cpp_properties.json 参照
     https://github.com/Microsoft/vscode-cpptools/blob/master/Documentation/LanguageServer/MinGW.md
+9, g++使用参照 https://cloud.tencent.com/developer/article/1176744
+10，makefile使用参照 https://seisman.github.io/how-to-write-makefile/introduction.html#id9
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 linux 下 设置
     "code-runner.executorMap":

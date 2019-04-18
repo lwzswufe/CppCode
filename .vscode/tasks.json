@@ -2,6 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Make Linux",
+            "type": "shell",
+            "command": "cd",
+            "args": [
+                "${fileDirname}",
+                "&&",
+                "make"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
             "label": "Build Linux",
             "type": "shell",
             "command": "g++",
