@@ -4,7 +4,7 @@
 #define CODEARRSIZE 7000
 
 int code2pos(const char * code)
-{    // 证券代码字符串转化为数组坐标 效率是map<string，int>的6倍
+{    // 证券代码字符串转化为数组坐标 效率是map<string，int>的5倍
     int head = (code[0] - 48) * 10 + (code[2] - 48);
     int bias, pos;
     switch (head)
@@ -106,7 +106,7 @@ int main()
     int cycle_times = 1000, map_size=500;
     vector<string> code_list = read_codelist();
     map<string, int> code_map;
-    double st_time = getTime();
+    double st_time;
     int i = 0, size = code_list.size();
     while (code_map.size() < map_size)
     {   
@@ -115,9 +115,11 @@ int main()
             i -= size;
         code_map[code_list[i]] = 0;
     }
+    st_time = getTime();
     for (int i=0; i<cycle_times; i++)
         test_1(code_list, arr);
     printf("test1 used:%.3lfs\n", getTime() - st_time);
+    st_time = getTime();
     for (int i=0; i<cycle_times; i++)
         test_2(code_list, code_map);
     printf("test2 used:%.3lfs\n", getTime() - st_time);
