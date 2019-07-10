@@ -55,12 +55,31 @@ void *task(void* args)
     pthread_exit(0);
 }
 
+struct thread_info
+{
+    char name[16];
+    int id;
+};
 
+void *task_with_param(void* args)
+{   
+    thread_info *pinfo = (thread_info *)args;
+    printf("name:%s id:%d\n", pinfo->name, pinfo->id);
+
+    pthread_t pid = pthread_self();
+    double task_st = GetTime();
+    long sleep_usec = (pid % 10) * 1000;
+    usleep(sleep_usec);
+    double task_ed = GetTime();
+    printf("thread %lu start:%.3lf end:%.3lf used:%.3lfs\n", 
+            pid, task_st, task_ed, task_ed - task_st);
+    pthread_exit(0);
+}
 
 int main()
 {   
     double main_st = GetTime();
-    pthread_t pid_1, pid_2;       // pthread_t多线程标识符
+    pthread_t pid_1, pid_2, pid_3; // pthread_t多线程标识符
     int ret;
     ret = pthread_create(&pid_1, NULL, task, NULL);         
     if(ret!=0)
@@ -74,10 +93,24 @@ int main()
         printf("Create pthread2 error!\n");
         return -1;
     }
+
+    thread_info * pinfo = new thread_info;
+    sprintf(pinfo->name, "thread_%d", 3);
+    pinfo->id = 3;
+
+    ret = pthread_create(&pid_3, NULL, task_with_param, pinfo);        
+    if(ret!=0)
+    {
+        printf("Create pthread3 error!\n");
+        return -1;
+    }
+
     pthread_join(pid_1, NULL);     // 主线程阻塞等待子线程1结束
     pthread_join(pid_2, NULL);     // 主线程阻塞等待子线程2结束
+    pthread_join(pid_3, NULL);     // 主线程阻塞等待子线程2结束
 
     double main_ed = GetTime();
     printf("main     start:%.3lf end:%.3lf used:%.3lfs\n"
             , main_st, main_ed, main_ed - main_st);
+    return 0;
 }
