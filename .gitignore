@@ -1,6 +1,7 @@
 /.vscode/ipch/
 /Cmake/build/
 /Cmake_Use/build/
+/Cmake_Multi_Project/build/
 *.o
 *.out
 *.a
