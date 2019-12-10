@@ -1,5 +1,5 @@
 #include <memory>
-
+#include <stdio.h>
 
 // 序列数据类
 template<typename _Tp>
@@ -15,30 +15,32 @@ public:
     // 释放方法
     ~Series();
     // 拷贝构造
-    Series(const Series&);
+    Series(const Series<_Tp>&);
     // 拷贝赋值
-    void operator=(const Series&)=delete;
+    void operator=(const Series<_Tp>&)=delete;
     // 首元素赋值
     void operator=(const _Tp &a);
     // 转换数据将数据延后 t期 返回偏执后的序列
-    Series& operator[](size_t t);
+    Series<_Tp>& operator[](const size_t t);
     // 隐式类型变换
     operator _Tp();
     // 在尾部增加变量
-    void append(const _Tp);
+    void push_back(const _Tp);
     // 从尾部开始访问第idx访问
-    _Tp& at(size_t idx);
-private:
+    _Tp& at(const size_t idx);
+    // 获取大小 储存数据的数量
+    size_t size() const;
+    // 获取储存空间大小
+    size_t capacity() const;
+    // 是否为空
+    bool empty() const;
+protected:
     // 分配空间 会创建一个略大于size的2^n
     void _alloc(const size_t size);
     // 分配空间 若一开始未分配 分配size=4 肉一开始分配了 分配size=当前size*2
     void _alloc();
     // 释放空间 释放地址为 begin的空间
     void _dealloc(const _Tp* begin);
-    // 获取大小
-    const size_t size();
-    // 获取分配空间大小
-    size_t capacity;
     // 起始元素位置
     _Tp* start;
     // 元素结束位置
@@ -53,7 +55,8 @@ Series<_Tp>::Series(const size_t size, const _Tp value)
     _alloc(size);
     for (size_t i=1; i<=size; i++)
     {
-        *(end - i) = value;
+        *end = value;
+        end++;
     }
 }
 
@@ -63,6 +66,7 @@ Series<_Tp>::Series(const _Tp value)
 {
     _alloc();
     *start = value;
+    end++;
 }
 
 // 默认构建方法
@@ -74,19 +78,12 @@ Series<_Tp>::Series()
 
 // 赋值构造函数
 template<typename _Tp>
-Series<_Tp>::Series(const Series& ser)
+Series<_Tp>::Series(const Series<_Tp>& ser)
 {
-    _alloc(ser.capacity);
-    memcpy(start, ser.start, ser.size() * sizeof(double));
+    _alloc(ser.capacity());
+    memcpy(start, ser.start, ser.size() * sizeof(_Tp));
+    end += ser.size();
 }
-
-// // 赋值
-// template<typename _Tp>
-// void Series<_Tp>::operator=(const Series& ser)
-// {
-//     _alloc(ser.capacity);
-//     memcpy(start, ser.start, ser.size() * sizeof(double));
-// }
 
 // 释放方法
 template<typename _Tp>
@@ -96,7 +93,6 @@ Series<_Tp>::~Series()
     start = NULL;
     end = NULL;
     stroage_end = NULL;
-    capacity = 0;
 }
 
 // 申请空间方法
@@ -106,17 +102,16 @@ void Series<_Tp>::_alloc(const size_t size)
     start = (_Tp*) malloc(sizeof(_Tp) * size);
     stroage_end = start + size;
     end = start;
-    capacity = size;
 }
 
 // 申请空间方法
 template<typename _Tp>
 void Series<_Tp>::_alloc()
 {   
-    if (capacity == 0)
+    if (capacity() == 0)
         _alloc(4);
     else
-        _alloc(capacity * 2);
+        _alloc(capacity() * 2);
 }
 
 // 释放方法
@@ -129,18 +124,18 @@ void Series<_Tp>::_dealloc(const _Tp* begin)
 
 // 从尾部开始访问第idx访问
 template<typename _Tp>
-_Tp& Series<_Tp>::at(size_t idx)
+_Tp& Series<_Tp>::at(const size_t idx)
 {   
     // 越界检查
     if(end <= start)
-        return 0;
+        return *start;
     else
         return *(end - idx - 1);
 }
 
 // 在尾部增加变量
 template<typename _Tp>
-void Series<_Tp>::append(const _Tp value)
+void Series<_Tp>::push_back(const _Tp value)
 {
     if (end >= stroage_end)
     {
@@ -161,9 +156,16 @@ void Series<_Tp>::append(const _Tp value)
     end++;
 }
 
-
+// 获取储存元素数目
 template<typename _Tp>
-const size_t Series<_Tp>::size()
+size_t Series<_Tp>::size() const
+{
+    return end - start;
+}
+
+// 获取储存空间大小
+template<typename _Tp>
+size_t Series<_Tp>::capacity() const
 {
     return stroage_end - start;
 }
@@ -180,13 +182,13 @@ template<typename _Tp>
 Series<_Tp>& Series<_Tp>::operator[](size_t t)
 {   
     if (t == 0)
-        return this;
+        return *this;
     else
     {
         std::unique_ptr<Series> shift_series = new Series;
         memcpy(shift_series, this, sizeof(Series));
         shift_series.end -= t;
-        return shift_series;
+        return *shift_series;
     }
 }
 
@@ -195,4 +197,10 @@ template<typename _Tp>
 Series<_Tp>::operator _Tp()
 {
     return *(end - 1);
+}
+
+template<typename _Tp>
+bool Series<_Tp>::empty() const
+{   
+    return end == start;
 }
