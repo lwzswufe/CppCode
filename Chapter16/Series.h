@@ -1,5 +1,6 @@
 #include <memory>
 #include <stdio.h>
+#include <string.h>
 
 // 序列数据类
 template<typename _Tp>
@@ -7,9 +8,9 @@ struct Series
 {
 public:
     // 指定数量 值 创建序列对象
-    Series(const size_t size, const _Tp value);
+    Series(const size_t size, const _Tp &value);
     // 指定数量 值 创建序列对象
-    Series(const _Tp value);
+    Series(const _Tp &value);
     // 默认构建方法
     Series();
     // 释放方法
@@ -25,7 +26,7 @@ public:
     // 隐式类型变换
     operator _Tp();
     // 在尾部增加变量
-    void push_back(const _Tp);
+    void push_back(const _Tp value);
     // 从尾部开始访问第idx访问
     _Tp& at(const size_t idx);
     // 获取大小 储存数据的数量
@@ -34,7 +35,11 @@ public:
     size_t capacity() const;
     // 是否为空
     bool empty() const;
+    // 输出信息
+    void show();
 protected:
+    // 初始化
+    void init(); 
     // 分配空间 会创建一个略大于size的2^n
     void _alloc(const size_t size);
     // 分配空间 若一开始未分配 分配size=4 肉一开始分配了 分配size=当前size*2
@@ -47,52 +52,74 @@ protected:
     _Tp* end;
     // 已分配空间终点
     _Tp* stroage_end;
+    // 偏置时区数目
+    size_t shift_time;
+    // 引用计数
+    bool is_copy;
 };
 
+
 template<typename _Tp>
-Series<_Tp>::Series(const size_t size, const _Tp value)
+void Series<_Tp>::init()
+{
+    is_copy = false;
+    shift_time = 0;
+}
+
+template<typename _Tp>
+Series<_Tp>::Series(const size_t size, const _Tp &value)
 {
     _alloc(size);
-    for (size_t i=1; i<=size; i++)
+    for (size_t i=0; i<size; i++)
     {
         *end = value;
         end++;
     }
+    init();
 }
 
 // 指定数量 值 创建序列对象
 template<typename _Tp>
-Series<_Tp>::Series(const _Tp value)
+Series<_Tp>::Series(const _Tp &value)
 {
-    _alloc();
-    *start = value;
+    _alloc(1);
+    *end = value;
     end++;
+    init();
 }
 
 // 默认构建方法
 template<typename _Tp>
 Series<_Tp>::Series()
 {
-    _alloc();
+    _alloc(1);
+    memset(start, 0, sizeof(_Tp));
+    end++;
+    init();
 }
 
-// 赋值构造函数
+// 赋值构造函数 浅拷贝
 template<typename _Tp>
 Series<_Tp>::Series(const Series<_Tp>& ser)
-{
-    _alloc(ser.capacity());
-    memcpy(start, ser.start, ser.size() * sizeof(_Tp));
-    end += ser.size();
+{   
+    memcpy(this, &ser, sizeof(Series<_Tp>));
+    is_copy = true;
+    if (size() > shift_time)
+        end -= shift_time;
+    shift_time = 0;
 }
 
 // 释放方法
 template<typename _Tp>
 Series<_Tp>::~Series()
-{
-    _dealloc(start);
-    start = NULL;
-    end = NULL;
-    stroage_end = NULL;
+{   
+    if (!is_copy)
+    {
+        _dealloc(start);
+        start = NULL;
+        end = NULL;
+        stroage_end = NULL;
+    }
 }
 
 // 申请空间方法
@@ -159,7 +186,7 @@ void Series<_Tp>::push_back(const _Tp value)
 // 获取储存元素数目
 template<typename _Tp>
 size_t Series<_Tp>::size() const
-{
+{   
     return end - start;
 }
 
@@ -172,35 +199,56 @@ size_t Series<_Tp>::capacity() const
 
 // 首元素赋值
 template<typename _Tp>
-void Series<_Tp>::operator=(const _Tp &a)
-{
-    *start = a;
+void Series<_Tp>::operator=(const _Tp &value)
+{   
+    *(end - shift_time - 1) = value;
+    shift_time = 0;
 }
 
 // 转换数据将数据延后 t期 返回偏置后的序列
 template<typename _Tp>
 Series<_Tp>& Series<_Tp>::operator[](size_t t)
 {   
+    // printf("[%lu] start:%p end:%p\n", t, start, end);
     if (t == 0)
+    {   
+        shift_time = 0;
         return *this;
+    }
     else
     {
-        std::unique_ptr<Series> shift_series = new Series;
-        memcpy(shift_series, this, sizeof(Series));
-        shift_series.end -= t;
-        return *shift_series;
+        shift_time = t;
+        return *this;
     }
 }
 
 // 隐式类型变换
 template<typename _Tp>
 Series<_Tp>::operator _Tp()
-{
-    return *(end - 1);
+{   
+    if (shift_time == 0)
+    {   
+        // printf("start:%p end:%p shift:%lu\n", start, end, shift_time);
+        return *(end - 1);
+    }
+    else
+    {   
+        _Tp* ptr = end - shift_time - 1;
+        shift_time = 0;
+        // printf("start:%p end:%p shift:%lu\n", start, end, shift_time);
+        return *ptr;
+    }
 }
+
 
 template<typename _Tp>
 bool Series<_Tp>::empty() const
 {   
     return end == start;
+}
+
+template<typename _Tp>
+void Series<_Tp>::show()
+{
+    printf("show____start:%p end:%p shift:%lu\n", start, end, shift_time);
 }

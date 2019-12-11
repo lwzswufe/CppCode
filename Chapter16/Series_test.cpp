@@ -14,7 +14,7 @@ void print(Series<_Tp> ser)
         std::cout << "Empty Series" << std::endl;
         return;
     }
-    for (size_t i=0; i<ser.size(); i++)
+    for (size_t i=0; i<ser.size() && i<10; i++)
         std::cout << ser.at(i) << ",";
     std::cout << std::endl;
 }
@@ -28,10 +28,13 @@ int main()
     print(ser_i);
     ser_i.at(0)++;
     print(ser_i);
-    ser_i.push_back(6);
+    ser_i.at(1)++;
     print(ser_i);
-    ser_i[1].at(0);
+    int a = ser_i[2] + 7;
+    ser_i[2] = a;
     print(ser_i);
-    // print(ser_i[1]);
+    print(ser_i[1]);
+    ser_i[1] = ser_i[1] + 1;
+    print(ser_i);
     return 0;
 };
