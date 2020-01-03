@@ -24,7 +24,7 @@ int main()
 {   
     Series<double> ser_d;
     print(ser_d);
-    Series<int> ser_i(3, 0);
+    Series<int> ser_i(3, 7);
     print(ser_i);
     ser_i.at(0)++;
     print(ser_i);
