@@ -1,6 +1,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string.h>
+#include <atomic>
 
 // 循环队列类
 template<typename _Tp>
@@ -12,9 +13,9 @@ public:
     // 析构函数
     ~CircularQueue();
     // 写入数据
-    void push(_Tp value);
+    bool push(_Tp);
     // 读取数据
-    bool pop(_Tp& value);
+    _Tp pop();
     // 是否为空
     bool empty();
     // 显示
@@ -31,9 +32,9 @@ private:
     // 容量
     size_t capacity;
     // 写入数
-    size_t push_n;
+    std::atomic<size_t> push_n{0};
     // 读取数
-    size_t pop_n;
+    std::atomic<size_t> pop_n{0};
     
 };
 
@@ -73,7 +74,7 @@ void CircularQueue<_Tp>::_dealloc()
 template<typename _Tp>
 size_t CircularQueue<_Tp>::size()
 {   
-    return capacity;
+    return push_n - pop_n;
 }
 
 template<typename _Tp>
@@ -88,24 +89,26 @@ void CircularQueue<_Tp>::show()
     //printf("show____start:%p end:%p shift:%lu\n", start, end, shift_time);
 }
 
-// 写入数据
+// 写入数据value
 template<typename _Tp>
-void CircularQueue<_Tp>::push(_Tp value)
+bool CircularQueue<_Tp>::push(_Tp value)
 {   
-    _arr[push_n % capacity] = value;
-    push_n++;
+    if (size() >= capacity)
+        return false;
+    size_t idx = ++push_n;
+    _arr[idx % capacity] = value;
+    return true;
 }
 
 // 读取数据
 template<typename _Tp>
-bool CircularQueue<_Tp>::pop(_Tp& value)
+_Tp CircularQueue<_Tp>::pop()
 {
     if (pop_n < push_n)
     {   
-        value = _arr[pop_n % capacity];
-        pop_n++;
-        return true;
+        size_t idx = ++pop_n;
+        return _arr[idx % capacity];
     }
     else
-        return false;
+        return NULL;
 }

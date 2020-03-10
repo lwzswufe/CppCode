@@ -16,12 +16,19 @@ int main()
     const double *const const_pi = &pi;
                                 // 指向常量对象的常量指针 *放在const前
                                 // 非常量可以转化为常量 反之则不行
-
-    
+    const char **const_char_arr = new const char * [2];
+                                // 指向常量的指针的的非常量数组
+                                // 该arr的元素是指向常量的
+    const char *str1{"str_1"}, *str2{"str_2"}, *str3{"str_3"};
     cout << "value: " << *cppi << "\naddress: " << cppi << endl;
     cppi = &dval;
     cout << "value: " << *cppi << "\naddress: " << cppi << endl;
-
+    const_char_arr[0] = str1;
+    const_char_arr[1] = str2;
+    const_char_arr[1] = str3;   // 该arr的元素是可以修改的
+    // const_char_arr[1][0] = '1'; // 该arr的元素指向的内容是不可以修改的
+    cout << const_char_arr[0] << const_char_arr[1] << endl;
+    const_char_arr = NULL;
     constexpr int mf = 20;     // 常量表达式
     constexpr int limit = mf + 2;
 }
