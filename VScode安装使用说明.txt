@@ -9,6 +9,21 @@
     https://github.com/Microsoft/vscode-cpptools/blob/master/Documentation/LanguageServer/MinGW.md
 9, g++使用参照 https://cloud.tencent.com/developer/article/1176744
 10，makefile使用参照 https://seisman.github.io/how-to-write-makefile/introduction.html#id9
+
+VScode配置文件路径宏:
+    ${workspaceFolder} - the path of the folder opened in VS Code
+    ${workspaceFolderBasename} - the name of the folder opened in VS Code without any slashes (/)
+    ${file} - the current opened file
+    ${relativeFile} - the current opened file relative to workspaceFolder
+    ${fileBasename} - the current opened file's basename
+    ${fileBasenameNoExtension} - the current opened file's basename with no file extension
+    ${fileDirname} - the current opened file's dirname
+    ${fileExtname} - the current opened file's extension
+    ${cwd} - the task runner's current working directory on startup
+    ${lineNumber} - the current selected line number in the active file
+    ${selectedText} - the current selected text in the active file
+    ${execPath} - the path to the running VS Code executable
+来源https://code.visualstudio.com/docs/editor/variables-reference
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 linux 下 设置
     "code-runner.executorMap":
