@@ -94,9 +94,15 @@ template<typename _Tp>
 bool CircularQueue<_Tp>::push(_Tp value)
 {   
     if (size() >= capacity)
+    {   
+        // printf("Queue is full push:%lu pop:%lu\n", size_t(push_n), size_t(pop_n));
         return false;
-    size_t idx = ++push_n;
-    _arr[idx % capacity] = value;
+    }
+    else
+    {
+        size_t idx = ++push_n;
+        _arr[idx % capacity] = value;
+    }
     return true;
 }
 
