@@ -7,7 +7,7 @@ int main()
 {   
     char *s;
 
-    int aa = 1543;
+    int a = 1543;
 
     sprintf(s, "a=%.4f", a);
 
