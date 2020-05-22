@@ -1,0 +1,11 @@
+1 下载最新版robo3T软件
+    https://robomongo.org/
+2 解压缩文件
+    tar -xvzf downloded_file.tar.gz
+3 复制文件到/usr/local/bin目录下
+    sudo mkdir /usr/local/bin/robomongo
+    sudo mv  robo3t_files/* /usr/local/bin/robomongo
+4 为新目录下的文件更改权限
+    cd /usr/local/bin/
+    sudo chmod +x robomongo
+    ./robomongo/bin/robo3t

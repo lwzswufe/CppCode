@@ -1,0 +1,33 @@
+MongoDB C驱动安装流程
+参照 https://www.jianshu.com/p/d77680254418
+
+1 下载mongo-c-driver发布版(release)的最新版 
+    如 mongo-c-driver-1.13.0.tar.gz
+2 解压文件
+    tar -xzf mongo-c-driver-1.13.0.tar.gz
+3 创建目录cmake-build
+    mkdir cmake-build
+4 在cmake-build目录下构建项目
+    cd cmake-build
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+5 安装驱动
+    make && sudo make install
+
+MongoDB C++驱动安装流程
+参照 https://www.jianshu.com/p/c982a2960175
+
+1 安装MongoDB C驱动
+2 下载mongo-cxx-driver发布版(release)的最新版
+    如r3.3.1.tar.gz
+3 解压文件
+    tar -xzf r3.3.1.tar.gz
+4 创建项目 注意 DCMAKE_INSTALL_PREFIX 用于指定mongo-c-driver安装位置
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+5 安装驱动
+    make && sudo make install
+
+可能会出现libmongocxx.so._noabi没找到的问题
+sudo gedit /etc/ld.so.conf
+末行添加：/usr/local/lib
+sudo ldconfig -v
