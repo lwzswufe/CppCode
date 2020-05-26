@@ -19,7 +19,14 @@ int main(int argc, char* argv[])
         reader.Login(argv[1], argv[2], nullptr, nullptr);
     else 
         reader.Login(argv[1], argv[2], argv[3], argv[4]);
-    reader.QueryAll("testdb", "testcollection");    
+    // 选择数据库 数据表
+    reader.SelectCollection("testdb", "testco");  
+    std::vector<Data> DataVec;  
+    reader.QueryAll(DataVec);
+    for (Data data:DataVec)
+    {
+        printf("Code:%d Name:%s\n", data.Code, data.Name);
+    }
     // 登出
     reader.Logout();
     //

@@ -13,6 +13,13 @@
 #include <mongocxx/options/client.hpp>
 #include <mongocxx/uri.hpp>
 
+
+struct Data
+{
+    int Code;
+    char Name[32];
+};
+
 class MongoDBReader
 {
 public:
@@ -25,10 +32,22 @@ public:
     // 登出
     void Logout();
     // 查询所有数据
-    void QueryAll(const char* basename, const char* collectionname);
-private:
+    void QueryAll(std::vector<Data> &DataVec);
+    // 选择某一个数据库
+    void SelectCollection(const char* basename, const char* collectionname);
+protected:
     // 驱动实例
     mongocxx::instance _Instance;
     // 连接句柄
     mongocxx::client _Client;
+    // 数据表
+    mongocxx::collection _Collection;
+    // 当前连接数据库名
+    char _BaseName[128] {0};
+    // 当前连接数据表名
+    char _CollectionName[128] {0};
+    // 当前连接用户名
+    char _UserName[128] {0};
+    // 当前服务器地址
+    char _Url[128] {0};
 };
