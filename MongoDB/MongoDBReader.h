@@ -2,8 +2,12 @@
 #include <iostream>
 #include <string>
 
+#include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/types.hpp>
+
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/stdx/make_unique.hpp>
 
@@ -13,7 +17,22 @@
 #include <mongocxx/options/client.hpp>
 #include <mongocxx/uri.hpp>
 
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_array;
+using bsoncxx::builder::basic::make_document;
+using Value = bsoncxx::document::value;
+using ConditionList = bsoncxx::v_noabi::builder::basic::document;           // 条件列表 可使用append方法增加条件Condition
+using Cursor = mongocxx::v_noabi::cursor;                                   // 数据表游标
 
+ 
+ template <typename T>
+using Condition = std::tuple<const char*, T&&>;                             // 筛选条件
+#define Equal(k, v) (kvp(k, make_document(kvp("$eq", v))))                  // 等于    doc[k] == v
+#define NotEqual(k, v) (kvp(k, make_document(kvp("$ne", v))))               // 不等于  doc[k] != v
+#define GraterThan(k, v) (kvp(k, make_document(kvp("$gt", v))))             // 大于    doc[k] >  v
+#define LessThan(k, v) (kvp(k, make_document(kvp("$lt", v))))               // 小于    doc[k] <  v
+#define GraterThanOrEqual(k, v) (kvp(k, make_document(kvp("$gte", v))))     // 大于等于 doc[k] >= v
+#define LessThanOrEqual(k, v) (kvp(k, make_document(kvp("$lte", v))))       // 小于等于 doc[k] <= v
 struct Data
 {
     int Code;
@@ -33,9 +52,15 @@ public:
     void Logout();
     // 查询所有数据
     void QueryAll(std::vector<Data> &DataVec);
+    // 查询指定范围的数据
+    void QueryBetween(std::vector<Data> &DataVec, int min_code, int max_code);
     // 选择某一个数据库
     void SelectCollection(const char* basename, const char* collectionname);
+    // 输出条件列表
+    static void PrintConditionList(const ConditionList& condlist);
 protected:
+    // 从查询结果中解析数据
+    static void ParseDataFromCursor(std::vector<Data> &DataVec, Cursor &cursor);
     // 驱动实例
     mongocxx::instance _Instance;
     // 连接句柄

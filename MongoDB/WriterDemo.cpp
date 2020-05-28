@@ -26,17 +26,20 @@ int main(int argc, char* argv[])
     std::vector<std::string>name_vec {"alpha", "beta", "gamma", "Delta"};
     for (unsigned i=0; i<name_vec.size(); ++i)
     {   
-        InsertData data{i};
+        Data data{i};
         strncpy(data.Name, name_vec[i].c_str(), 32);
         writer.Insert_One(&data);
     }
-    InsertData arr[4];
+    Data arr[4];
     for (unsigned i=0; i<name_vec.size(); ++i)
     {   
         arr[i].Code = i + 4;
         strncpy(arr[i].Name, name_vec[i].c_str(), 32);
     }
     writer.Insert_Many(arr, 4);
+    // 更新
+    Data data{3, "Cindy"};
+    writer.Update_One(&data);
     // 登出
     writer.Logout();
     return 0;

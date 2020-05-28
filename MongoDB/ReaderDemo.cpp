@@ -27,6 +27,12 @@ int main(int argc, char* argv[])
     {
         printf("Code:%d Name:%s\n", data.Code, data.Name);
     }
+    DataVec.clear();
+    reader.QueryBetween(DataVec, 3, 5);
+    for (Data data:DataVec)
+    {
+        printf("Code:%d Name:%s\n", data.Code, data.Name);
+    }
     // 登出
     reader.Logout();
     //

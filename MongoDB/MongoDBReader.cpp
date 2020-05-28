@@ -51,7 +51,7 @@ void MongoDBReader::SelectCollection(const char* basename, const char* collectio
 void MongoDBReader::QueryAll(std::vector<Data> &DataVec)
 // Query for all the documents in a collection.
 {   
-    mongocxx::v_noabi::cursor cursor = _Collection.find({});
+    Cursor cursor = _Collection.find({});
     size_t count = 0;
     for (auto&& doc : cursor) 
     {   
@@ -83,4 +83,47 @@ void MongoDBReader::QueryAll(std::vector<Data> &DataVec)
     }
     printf("%s[%s] total:%ld data\n", _BaseName, _CollectionName, count);
     // @end: cpp-query-all
+}
+
+void MongoDBReader::QueryBetween(std::vector<Data> &DataVec, int min_code, int max_code)
+{
+    if (min_code > max_code)
+        return;
+    ConditionList condlist;
+    if (min_code == max_code)
+    {   
+        condlist.append(Equal("Code", min_code));
+        // condlist.append(kvp("Code", min_code));
+    }
+    else
+    {   
+        std::string k{"Code"};
+        condlist.append(LessThanOrEqual("Code", max_code));
+        condlist.append(GraterThanOrEqual("Code", min_code));
+        // condlist.append(kvp("Code", make_document(kvp("$gte", min_code))));
+        // condlist.append(kvp("Code", make_document(kvp("$lte", max_code))));
+    }
+    PrintConditionList(condlist);
+    Cursor cursor = _Collection.find(condlist.extract());
+    ParseDataFromCursor(DataVec, cursor);
+    printf("%s[%s] total:%lu data\n", _BaseName, _CollectionName, DataVec.size());
+}
+
+
+void MongoDBReader::ParseDataFromCursor(std::vector<Data> &DataVec, Cursor &cursor)
+{
+    for (auto&& doc : cursor) 
+    {   
+        // 获取数据
+        Data data;
+        data.Code = doc["Code"].get_int32();
+        strncpy(data.Name, doc["Name"].get_utf8().value.to_string().c_str(), 32);
+        DataVec.push_back(data);
+    }
+}
+
+// 输出条件列表
+void MongoDBReader::PrintConditionList(const ConditionList& condlist)
+{
+    std::cout << bsoncxx::to_json(condlist.view()) << std::endl;
 }

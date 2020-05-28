@@ -1,10 +1,7 @@
 #include "MongoDBWriter.h"
-using bsoncxx::builder::basic::kvp;
-using bsoncxx::builder::basic::make_array;
-using bsoncxx::builder::basic::make_document;
 
 
-void MongoDBWriter::Insert_One(Data* data)
+void MongoDBWriter::Insert_One(const Data* data)
 {   
     static int count{0};
     if (count % 2 == 0)
@@ -12,7 +9,8 @@ void MongoDBWriter::Insert_One(Data* data)
         bsoncxx::builder::stream::document document{};
         document // << "_id"  << count
                  << "Name" << data->Name
-                 << "Code" << data->Code;
+                 << "Code" << data->Code
+                 << "Time" << "2020-04-10 14:55:23";
         std::cout << bsoncxx::to_json(document) << std::endl;
         _Collection.insert_one(document.view());
     }
@@ -21,7 +19,8 @@ void MongoDBWriter::Insert_One(Data* data)
         bsoncxx::document::value doc = make_document(
         //    kvp("_id",  count),
             kvp("Name", data->Name),
-            kvp("Code", data->Code));
+            kvp("Code", data->Code), 
+            kvp("Time", "2020-04-10 14:55:23"));
         std::cout << bsoncxx::to_json(doc.view()) << std::endl;
         // 这里必须使用std::move  使用后 原有doc内容会失效
         auto res = _Collection.insert_one(std::move(doc));
@@ -30,7 +29,7 @@ void MongoDBWriter::Insert_One(Data* data)
     ++count;
 }
 
-void MongoDBWriter::Insert_Many(Data* data, int num)
+void MongoDBWriter::Insert_Many(const Data* data, int num)
 {   
     std::vector<bsoncxx::document::value> DocVec;
     for (int i=0; i<num; ++i)
@@ -44,6 +43,20 @@ void MongoDBWriter::Insert_Many(Data* data, int num)
     auto res = _Collection.insert_many(DocVec);
     printf("%s[%s] Insert %d Data\n", _BaseName, _CollectionName, res.value().inserted_count());
 }
+
+void MongoDBWriter::Update_One(const Data* data)
+{
+    auto res = _Collection.update_one(make_document(kvp("Code", data->Code)),
+                                      make_document(kvp("$set", make_document(kvp("Name", data->Name)))));
+    printf("%s[%s] Update %d Data\n", _BaseName, _CollectionName, res.value().modified_count());
+}
+
+// void MongoDBWriter::Update_One(const Data* data)
+// {
+//     _Collection.update_one(make_document(kvp("$", "3")),
+//                            make_document(kvp("$set", make_document(kvp("address.street", "East 31st Street"));
+// }
+
 
 void MongoDBWriter::Clear()
 {

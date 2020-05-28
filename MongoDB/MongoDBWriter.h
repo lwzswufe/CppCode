@@ -1,16 +1,14 @@
 #include "MongoDBReader.h"
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/types.hpp>
-
 
 class MongoDBWriter : public MongoDBReader
 {  
 public: 
     // 插入数据
-    void Insert_One(Data* data);
+    void Insert_One(const Data* data);
     // 插入多条数据
-    void Insert_Many(Data* data, int num);
+    void Insert_Many(const Data* data, int num);
+    // 更新一条数据
+    void Update_One(const Data* data);
     // 清空数据表
     void Clear();
 };
