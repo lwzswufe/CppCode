@@ -17,15 +17,21 @@
 #include <mongocxx/options/client.hpp>
 #include <mongocxx/uri.hpp>
 
+#include <chrono>
+// 北京时间于标准时间的时差
+extern std::chrono::hours TimeDifference; 
+using CxxTime = std::chrono::system_clock::time_point;
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
+using BsonID = bsoncxx::types::b_oid;
+using BsonDate = bsoncxx::types::b_date;
 using Value = bsoncxx::document::value;
 using ConditionList = bsoncxx::v_noabi::builder::basic::document;           // 条件列表 可使用append方法增加条件Condition
 using Cursor = mongocxx::v_noabi::cursor;                                   // 数据表游标
 
  
- template <typename T>
+template <typename T>
 using Condition = std::tuple<const char*, T&&>;                             // 筛选条件
 #define Equal(k, v) (kvp(k, make_document(kvp("$eq", v))))                  // 等于    doc[k] == v
 #define NotEqual(k, v) (kvp(k, make_document(kvp("$ne", v))))               // 不等于  doc[k] != v
@@ -58,6 +64,10 @@ public:
     void SelectCollection(const char* basename, const char* collectionname);
     // 输出条件列表
     static void PrintConditionList(const ConditionList& condlist);
+    // 输出时间
+    static void PrintDatetime(const std::chrono::system_clock::time_point &datetime);
+    // 输出时间
+    static void PrintDatetime(const std::chrono::milliseconds &duration_ms);
 protected:
     // 从查询结果中解析数据
     static void ParseDataFromCursor(std::vector<Data> &DataVec, Cursor &cursor);

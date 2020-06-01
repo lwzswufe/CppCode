@@ -24,12 +24,14 @@ int main(int argc, char* argv[])
     // 清除所有数据
     writer.Clear();  
     std::vector<std::string>name_vec {"alpha", "beta", "gamma", "Delta"};
+    // 一次插入一条数据
     for (unsigned i=0; i<name_vec.size(); ++i)
     {   
         Data data{i};
         strncpy(data.Name, name_vec[i].c_str(), 32);
         writer.Insert_One(&data);
     }
+    // 一次插入多条数据
     Data arr[4];
     for (unsigned i=0; i<name_vec.size(); ++i)
     {   

@@ -1,5 +1,7 @@
 #include "MongoDBReader.h"
 
+std::chrono::hours TimeDifference{8};
+
 void MongoDBReader::Login(const char* ip, const char* port, const char* user, const char* pwd)
 {   
     // 生成统一资源标识符URI的字符串uri_s
@@ -64,17 +66,19 @@ void MongoDBReader::QueryAll(std::vector<Data> &DataVec)
         for (auto&& element: doc)
         {   
             std::cout << element.key() << ":";
-            if (element.type() == bsoncxx::type::k_oid)
+            switch (element.type())
             {
-                std::cout << element.get_oid().value.to_string();
-            }
-            else if (element.type() == bsoncxx::type::k_utf8)
-            {
-                std::cout << element.get_utf8().value;
-            }
-            else if (element.type() == bsoncxx::type::k_int32)
-            {
-                std::cout << element.get_int32().value;
+            case bsoncxx::type::k_oid:
+                std::cout << element.get_oid().value.to_string(); break;
+            case bsoncxx::type::k_utf8:
+                std::cout << element.get_utf8().value; break;
+            case bsoncxx::type::k_int32:
+                std::cout << element.get_int32().value; break;
+            case bsoncxx::type::k_date:
+                std::cout << element.get_date() << " "; 
+                PrintDatetime(element.get_date().value); break;
+            default:
+                std::cout << "unknown type";
             }
             std::cout << ", ";
         }
@@ -126,4 +130,27 @@ void MongoDBReader::ParseDataFromCursor(std::vector<Data> &DataVec, Cursor &curs
 void MongoDBReader::PrintConditionList(const ConditionList& condlist)
 {
     std::cout << bsoncxx::to_json(condlist.view()) << std::endl;
+}
+
+// 输出时间
+void MongoDBReader::PrintDatetime(const std::chrono::system_clock::time_point &datetime)
+{   
+    // 获取毫秒时间
+    std::chrono::milliseconds one_milliseconds{1};
+    int ms = (datetime.time_since_epoch() / one_milliseconds) % 1000;
+    // 生成时间字符串
+    time_t time = std::chrono::system_clock::to_time_t(datetime);
+    tm *ti = localtime(&time);
+    char datetimestr[32];
+    sprintf(datetimestr, "%04d-%02d-%02d %02d:%02d:%02d.%03d\n",
+            1900 + ti->tm_year, ti->tm_mon, ti->tm_mday, 
+            ti->tm_hour, ti->tm_min, ti->tm_sec, ms);
+    std::cout << datetimestr;
+}
+
+// 输出时间
+void MongoDBReader::PrintDatetime(const std::chrono::milliseconds &duration_ms)
+{   
+    std::chrono::system_clock::time_point datetime{duration_ms};
+    PrintDatetime(datetime);
 }

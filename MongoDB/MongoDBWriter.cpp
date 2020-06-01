@@ -4,23 +4,27 @@
 void MongoDBWriter::Insert_One(const Data* data)
 {   
     static int count{0};
+    // 获取当前时间
+    std::chrono::system_clock::time_point today = std::chrono::system_clock::now() + TimeDifference;
+    // 转换为bson时间
+    BsonDate datetime = BsonDate(today);
     if (count % 2 == 0)
     {   // 插入方法1
         bsoncxx::builder::stream::document document{};
-        document // << "_id"  << count
+        document << "_id"  << count
                  << "Name" << data->Name
                  << "Code" << data->Code
-                 << "Time" << "2020-04-10 14:55:23";
+                 << "Time" << datetime;
         std::cout << bsoncxx::to_json(document) << std::endl;
         _Collection.insert_one(document.view());
     }
     else
     {   // 插入方法2
         bsoncxx::document::value doc = make_document(
-        //    kvp("_id",  count),
+            kvp("_id",  count),
             kvp("Name", data->Name),
             kvp("Code", data->Code), 
-            kvp("Time", "2020-04-10 14:55:23"));
+            kvp("Time", datetime));
         std::cout << bsoncxx::to_json(doc.view()) << std::endl;
         // 这里必须使用std::move  使用后 原有doc内容会失效
         auto res = _Collection.insert_one(std::move(doc));
@@ -32,12 +36,17 @@ void MongoDBWriter::Insert_One(const Data* data)
 void MongoDBWriter::Insert_Many(const Data* data, int num)
 {   
     std::vector<bsoncxx::document::value> DocVec;
+    // 获取当前时间
+    std::chrono::system_clock::time_point today = std::chrono::system_clock::now() + TimeDifference;
+    // 转换为bson时间
+    BsonDate datetime = BsonDate(today);
     for (int i=0; i<num; ++i)
-    {
+    {   
         bsoncxx::document::value doc = make_document(
-                                        // kvp("_id",  data[i].Code),
+                                        // kvp("_id",  oid),
                                         kvp("Name", data[i].Name),
-                                        kvp("Code", data[i].Code));
+                                        kvp("Code", data[i].Code),
+                                        kvp("Time", datetime));
         DocVec.push_back(doc);
     }
     auto res = _Collection.insert_many(DocVec);
