@@ -44,7 +44,7 @@ g++ -g -Wall -std=c++11 LogQueue.h LogQueue.cpp Multi_Thread_LogQueue.cpp -o Log
 */
 int rnd()
 {   
-    return rand() % 16;
+    return rand() % 32;
 } 
 
 string getCurrentTimeStr()
@@ -172,18 +172,11 @@ void *task_push(void* args)
 #endif  
         char log_level{1};
         char* s = GetBlankString(log_level);
-        if (s != nullptr)
-        {
-            string str = getCurrentTimeStr();
-            sprintf(s, "%p_thread_%02d_msg_%04d_%s\n", s, id, i+1, str.c_str());
-            ComfirmString(s);
-            ++i;
-            ++COUNT_PUSH;
-        }
-        else
-        {
-            //printf("Queue is full push:%u pop:%u\n", push_n, pop_n);
-        }
+        string str = getCurrentTimeStr();
+        sprintf(s, "%p_thread_%02d_msg_%04d_%s\n", s, id, i+1, str.c_str());
+        ComfirmString(s);
+        ++i;
+        ++COUNT_PUSH;
     }
     printf("%s thread push %02d end\n", getCurrentTimeStr().c_str(), id);
 }

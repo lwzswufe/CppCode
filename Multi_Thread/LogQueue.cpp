@@ -1,4 +1,6 @@
 #include "LogQueue.h"
+#include <exception>
+using std::runtime_error;
 
 struct LogQueue
 {   
@@ -24,7 +26,7 @@ static LogQueue* BACKUP_QUEUE{nullptr};
 // 队列数组
 static LogQueue* QueueArr[QUEUE_NUM];
 // 是否写出备选信息
-static bool WRITE_BACKUP{false};
+static std::atomic<bool> WRITE_BACKUP{false};
 
 
 static void Dealloc(LogQueue* queue)
@@ -77,6 +79,8 @@ void LogQueueInitial(size_t _size, size_t length)
         }
     }
     CURRENT_QUEUE = QueueArr[0];
+    BACKUP_QUEUE = QueueArr[1];
+    printf("Current:%p Backup:%p\n", CURRENT_QUEUE, BACKUP_QUEUE);
 };
 
 // 获取指定队列当前储存日志数量 
@@ -92,19 +96,25 @@ char* GetBlankString(char log_level)
     {   
         // 判断备用日志队列是否为空
         if (Size(BACKUP_QUEUE) != 0)
-        {
-            printf("BackupQueue is not empty but CurrentQueue is full push:%lu pop:%lu\n", 
-                   size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
-            return nullptr;
+        {   
+            char s[128];
+            sprintf(s, "BackupQueue is not empty push:%lu pop:%lu but CurrentQueue is full push:%lu pop:%lu \n", 
+                    size_t(BACKUP_QUEUE->push_n), size_t(BACKUP_QUEUE->pop_n), 
+                    size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
+            printf(s);
+            throw runtime_error(s);
         }
         else
-        {   // 交换当前日志队列与 备用日志队列
+        {   
+            WRITE_BACKUP = true;
+            printf("Switch BackupQueue push:%lu pop:%lu And CurrentQueue push:%lu pop:%lu \n", 
+                    size_t(BACKUP_QUEUE->push_n), size_t(BACKUP_QUEUE->pop_n), 
+                    size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
+            // 交换当前日志队列与 备用日志队列
             LogQueue* temp = CURRENT_QUEUE;
             CURRENT_QUEUE = BACKUP_QUEUE;
             BACKUP_QUEUE = temp;
-            WRITE_BACKUP = true;
         }
-        
     }
 
     size_t str_id = CURRENT_QUEUE->push_n++ % CURRENT_QUEUE->capacity;
@@ -135,6 +145,7 @@ const char* GetWriteString()
     }
     else
         queue = BACKUP_QUEUE;
+    // printf("%p push:%lu pop:%lu\n", queue, (size_t)queue->push_n, (size_t)queue->pop_n);
     // 获取待写出信息
     if (queue->pop_n < queue->push_n)
     {   
@@ -142,6 +153,7 @@ const char* GetWriteString()
         if (queue->string_arr[idx][queue->length-1] == 127)
         {   
             ++queue->pop_n;
+            // printf("output %lu:%s", idx, queue->string_arr[idx]);
             return queue->string_arr[idx];
         }
         
@@ -151,6 +163,7 @@ const char* GetWriteString()
 
 void ComfirmString(char* log)
 {
-    log[CURRENT_QUEUE->length - 1] = 127;
-    printf("Confirm %lu:%s\n", CURRENT_QUEUE->push_n, log);
+    log[CURRENT_QUEUE->length - 2] = 127;
+    // int str_id = (log - 1 - CURRENT_QUEUE->string) / CURRENT_QUEUE->length;
+    // printf("Confirm %04d:%s", str_id, log);
 }
