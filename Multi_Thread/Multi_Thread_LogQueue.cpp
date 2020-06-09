@@ -170,13 +170,13 @@ void *task_push(void* args)
 #else
         usleep(sleep_ms);
 #endif  
-        size_t str_id;
-        char* s = GetBlankString(1, str_id);
+        char log_level{1};
+        char* s = GetBlankString(log_level);
         if (s != nullptr)
         {
             string str = getCurrentTimeStr();
-            sprintf(s, "%lu:%p_thread_%02d_msg_%04d_%s\n", str_id, s, id, i+1, str.c_str());
-            ComfirmString(str_id);
+            sprintf(s, "%p_thread_%02d_msg_%04d_%s\n", s, id, i+1, str.c_str());
+            ComfirmString(s);
             ++i;
             ++COUNT_PUSH;
         }
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
     if (argc >= 2)
         thread_n = atoi(argv[1]);
     printf("thread_n = %d, N = %d\n", thread_n, N);
-    LogQueueInitial(4096, 512);
+    LogQueueInitial(128, 512);
 #ifdef _WIN32
     thread* thread_arr[thread_n];
     for (int i=0; i<thread_n; i++)
