@@ -44,7 +44,7 @@ g++ -g -Wall -std=c++11 LogQueue.h LogQueue.cpp Multi_Thread_LogQueue.cpp -o Log
 */
 int rnd()
 {   
-    return rand() % 16;
+    return rand() % 8;
 } 
 
 string getCurrentTimeStr()

@@ -8,6 +8,8 @@ struct LogQueue
     size_t length;
     // 队列大小
     size_t capacity;
+    // 提前量
+    size_t advance;
     // 日志信息数组储存地址
     LogInfo* arr;
     // 队列写入数
@@ -17,8 +19,6 @@ struct LogQueue
 };
 // 队列数量
 const static size_t QUEUE_NUM{2};
-// 切换队列的提前量
-static size_t SWITCH_ADVANCE{10};
 // 当前使用一个队列
 static LogQueue* CURRENT_QUEUE{nullptr};
 // 当前使用一个队列
@@ -31,13 +31,15 @@ static std::atomic<bool> EXTEND_BACKUP{false};
 static std::atomic<bool> SWITCHED{false};
 
 
-static void Dealloc(LogQueue* queue)
+static bool Dealloc(LogQueue* queue)
 {
     if (queue->arr != nullptr)
     {
         delete[] queue->arr;
+        queue->arr = nullptr;
+        return true;
     }
-    queue->arr = nullptr;
+    return false;
 };
 
 static bool Alloc(LogQueue* queue)
@@ -64,11 +66,13 @@ void LogQueueInitial(size_t _size, size_t advance)
         Dealloc(QueueArr[i]);
         QueueArr[i]->capacity = _size;
         QueueArr[i]->length = sizeof(LogInfo);
+        QueueArr[i]->advance = advance;
         if (Alloc(QueueArr[i]))
         {
             QueueArr[i]->push_n = 0;
             QueueArr[i]->pop_n = 0;
-            printf("LogQueue[%u] Initial Over %p capacity:%lu length:%lu\n", i, QueueArr[i], QueueArr[i]->capacity, QueueArr[i]->length);
+            printf("LogQueue[%u] Initial Over %p capacity:%lu length:%lu Advance:%lu\n",
+                    i, QueueArr[i], QueueArr[i]->capacity, QueueArr[i]->length, QueueArr[i]->advance);
         }
         else
         {
@@ -77,8 +81,7 @@ void LogQueueInitial(size_t _size, size_t advance)
     }
     CURRENT_QUEUE = QueueArr[0];
     BACKUP_QUEUE = QueueArr[1];
-    SWITCH_ADVANCE = advance;
-    printf("Current:%p Backup:%p Advance:%lu\n", CURRENT_QUEUE, BACKUP_QUEUE, SWITCH_ADVANCE);
+    printf("Current:%p Backup:%p\n", CURRENT_QUEUE, BACKUP_QUEUE);
 };
 
 // 获取指定队列当前储存日志数量 
@@ -105,7 +108,7 @@ LogInfo* GetBlankString(char log_level)
 {   
     LogQueue* queue = CURRENT_QUEUE;
     // 判断当前日志队列是否已满
-    if (Size(CURRENT_QUEUE) + SWITCH_ADVANCE >= CURRENT_QUEUE->capacity)
+    if (Size(CURRENT_QUEUE) + CURRENT_QUEUE->advance >= CURRENT_QUEUE->capacity)
     {   
         // 判断备用日志队列是否为空
         if (Size(CURRENT_QUEUE) > CURRENT_QUEUE->capacity)
@@ -143,9 +146,14 @@ const LogInfo* GetWriteString()
         if (EXTEND_BACKUP)
         {
             // 对备用队列进行扩容
-            Dealloc(BACKUP_QUEUE);
-            BACKUP_QUEUE->capacity *= 2;
-            Alloc(BACKUP_QUEUE);
+            if (Dealloc(BACKUP_QUEUE))
+            {
+                BACKUP_QUEUE->capacity *= 2;
+                BACKUP_QUEUE->advance *= 2;
+                printf("BACKUP_QUEUE %p capacity:%lu length:%lu Advance:%lu\n",
+                        BACKUP_QUEUE, BACKUP_QUEUE->capacity, BACKUP_QUEUE->length, BACKUP_QUEUE->advance);
+                Alloc(BACKUP_QUEUE);
+            }
             // 标注备用队列信息已写出
             EXTEND_BACKUP = false;
         }
