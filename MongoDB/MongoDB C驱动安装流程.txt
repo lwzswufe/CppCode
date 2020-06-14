@@ -23,9 +23,10 @@ MongoDB C++驱动安装流程
     tar -xzf r3.3.1.tar.gz
 4 创建项目 注意 DCMAKE_INSTALL_PREFIX 用于指定mongo-c-driver安装位置
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local DCMAKE_PREFIX_PATH=/usr/local ..
 5 安装驱动
     make && sudo make install
+    安装过程中若提示  MNMLSTC 安装出现问题 请输入 sudo make EP_mnmlstc_core
 
 可能会出现libmongocxx.so._noabi没找到的问题
 sudo gedit /etc/ld.so.conf
