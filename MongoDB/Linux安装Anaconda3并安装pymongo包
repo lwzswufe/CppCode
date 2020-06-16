@@ -1,0 +1,24 @@
+在Linux上安装Anaconda3
+
+1 在清华大学镜像网站https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/ 下载anaconda3离线安装包
+  如:Anaconda3-2020.02-Linux-x86_64.sh
+
+2 在安装文件所在目录使用管理员权限运行 sh Anaconda3-2020.02-Linux-x86_64.sh
+  在安装过程中指定anaconda3安装目录 /home/anaconda3
+
+3 设置环境变量
+  vi .bash_profile 
+  在最后一行加上如下配置:
+  export PATH=/home/anaconda3/bin:$PATH
+  然后使其生效:
+  source .bash_profile
+
+4 运行python3 -V 检查安装版本
+
+安装pymongo
+
+1 在https://pypi.org/project/pymongo/#files下载指定python版本的pymongo的离线安装包
+  如:pymongo-3.10.1-cp37-cp37m-manylinux2014_x86_64.whl
+
+2 进入到anaconda3/bin目录
+  使用管理员权限运行 pip install pymongo-3.10.1-cp37-cp37m-manylinux2014_x86_64.whl

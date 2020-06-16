@@ -1,6 +1,5 @@
 Ubuntu系统MongoDB在线安装
 
-
 根据 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 1 wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
@@ -29,3 +28,40 @@ sudo service mongod stop
 
 重启服务
 sudo service mongod restart
+
+
+CentOS系统MongoDB离线安装教程 参照 https://juejin.im/post/5cbe73f86fb9a0320b40d687
+
+1 在https://www.mongodb.com/try/download/community下载rpm安装文件如：
+  mongodb-org-server-4.2.8-1.el7.x86_64.rpm
+
+2 在rpm所在文件夹用管理员权限运行命令安装
+  yum install mongodb-org-server-4.2.8-1.el7.x86_64.rpm
+
+3 验证安装结果
+  rpm -qa |grep mongodb
+  rpm -ql mongodb-org-server
+
+4 启动MongoDB
+  systemctl start mongod.service
+
+5 端口检查
+  netstat -natp | grep 27017
+
+6 检查MongoDB是否在运行
+  ps -aux | grep mongod    # 查看数据库的进程是否存在
+
+常用命令:
+// 1、开启MongoDB
+sudo service mongod start  或者 systemctl start mongod.service  # 开启MongoDB
+sudo chkconfig mongod on  # 加入开机启动
+sudo service mongod restart # 重启MongoDB
+
+// 2、关闭MongoDB
+sudo service mongod stop  # 关闭防火墙
+
+// 3、卸载MongoDB
+sudo yum erase $(rpm -qa | grep mongodb-org)    # 卸载MongoDB
+sudo rm -r /var/log/mongodb  # 删除日志文件
+sudo rm -r /var/lib/mongo    # 删除数据文件
+
