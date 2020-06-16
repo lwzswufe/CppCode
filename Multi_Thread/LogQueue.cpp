@@ -1,100 +1,194 @@
 #include "LogQueue.h"
+#include <exception>
+using std::runtime_error;
 
-static size_t CAPACITY = 0;
-static size_t LENGTH = 0;
-static char ** STRING_ARR = nullptr;
-static char *  STRING = nullptr;
-// 写入数
-std::atomic<size_t> PUSH_N{0};
-// 读取数
-std::atomic<size_t> POP_N{0};
+struct LogQueue
+{   
+    // 日志长度
+    size_t length;
+    // 队列大小
+    size_t capacity;
+    // 提前量
+    size_t advance;
+    // 日志信息数组储存地址
+    LogInfo* arr;
+    // 队列写入数
+    std::atomic<size_t> push_n;
+    // 队列读取数
+    std::atomic<size_t> pop_n;
+};
+// 队列数量
+const static size_t QUEUE_NUM{2};
+// 当前使用一个队列
+static LogQueue* CURRENT_QUEUE{nullptr};
+// 当前使用一个队列
+static LogQueue* BACKUP_QUEUE{nullptr};
+// 队列数组
+static LogQueue* QueueArr[QUEUE_NUM];
+// 是否写出备选信息
+static std::atomic<bool> EXTEND_BACKUP{false};
+// 是否写出备选信息
+static std::atomic<bool> SWITCHED{false};
 
-void static Dealloc()
+
+static bool Dealloc(LogQueue* queue)
 {
-    if (STRING_ARR != nullptr)
+    if (queue->arr != nullptr)
     {
-        for (size_t i=0; i<CAPACITY; i++)
-        {
-            delete[] STRING_ARR[i];
-        }
-        delete[] STRING_ARR;
+        delete[] queue->arr;
+        queue->arr = nullptr;
+        return true;
     }
-    STRING_ARR = nullptr;
+    return false;
 };
 
-bool static Alloc()
+static bool Alloc(LogQueue* queue)
 {
-    if (STRING_ARR != nullptr)
+    if (queue->arr != nullptr)
     {
-       printf("error in alloc because STRING_ARR is not null\n");
+       printf("error in alloc because queue:%p's string is not null\n", queue);
        return false;
     }
-    STRING_ARR = new char*[CAPACITY];
-    STRING = new char[CAPACITY * LENGTH];
-    for (size_t i=0; i<CAPACITY; i++)
-    {
-        STRING_ARR[i] = STRING + i * LENGTH;
-    }
+    queue->arr = new LogInfo[queue->capacity];
+    memset(queue->arr, 0, sizeof(LogInfo) * queue->capacity);
     return true;
 };
 
-void LogQueueInitial(size_t _size, size_t length)
+void LogQueueInitial(size_t _size, size_t advance)
 {   
-    Dealloc();
-    CAPACITY = _size;
-    LENGTH = length;
-    if (Alloc())
-    {
-        PUSH_N = 0;
-        POP_N = 0;
-        printf("LogQueue Initial Over capacity:%lu length:%lu\n", CAPACITY, LENGTH);
-    }
-    else
-        printf("LogQueue Initial Failed\n");
-}
-
-size_t static Size()
-{
-    return PUSH_N - POP_N;
-}
-
-char* GetBlankString(char log_level, size_t &str_id)
-{
-    if (Size() >= CAPACITY)
+    for (unsigned i=0; i<QUEUE_NUM; ++i)
     {   
-        // printf("Queue is full push:%lu pop:%lu\n", size_t(push_n), size_t(pop_n));
-        return nullptr;
+        if (QueueArr[i] != nullptr)
+        {
+            printf("LogQueue[%d] Initial has Initialed\n", i);
+        }
+        QueueArr[i] = new LogQueue{0};
+        Dealloc(QueueArr[i]);
+        QueueArr[i]->capacity = _size;
+        QueueArr[i]->length = sizeof(LogInfo);
+        QueueArr[i]->advance = advance;
+        if (Alloc(QueueArr[i]))
+        {
+            QueueArr[i]->push_n = 0;
+            QueueArr[i]->pop_n = 0;
+            printf("LogQueue[%u] Initial Over %p capacity:%lu length:%lu Advance:%lu\n",
+                    i, QueueArr[i], QueueArr[i]->capacity, QueueArr[i]->length, QueueArr[i]->advance);
+        }
+        else
+        {
+            printf("LogQueue[%u] Initial Failed\n", i);
+        }
     }
-    else
-    {
-        str_id = PUSH_N++ % CAPACITY;
-        char * str = STRING_ARR[str_id];
-        memset(str, 0, LENGTH * sizeof(char));
-        str[0] = log_level;
-        return str + 1;
-    }
+    CURRENT_QUEUE = QueueArr[0];
+    BACKUP_QUEUE = QueueArr[1];
+    printf("Current:%p Backup:%p\n", CURRENT_QUEUE, BACKUP_QUEUE);
+};
+
+// 获取指定队列当前储存日志数量 
+static size_t Size(const LogQueue* queue)
+{
+    return queue->push_n - queue->pop_n;
+};
+
+static void SwitchQueue()
+{   
+    // 切换队列
+    printf("Switch BackupQueue push:%lu pop:%lu And CurrentQueue push:%lu pop:%lu \n", 
+            size_t(BACKUP_QUEUE->push_n), size_t(BACKUP_QUEUE->pop_n), 
+            size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
+    // 交换当前日志队列与 备用日志队列
+    LogQueue* temp = CURRENT_QUEUE;
+    CURRENT_QUEUE = BACKUP_QUEUE;
+    BACKUP_QUEUE = temp;
+    // 准备清空备用队列并扩展备用队列
+    EXTEND_BACKUP = true;
 }
 
-const char* GetWriteString()
-{
-    if (POP_N < PUSH_N)
+LogInfo* GetBlankString(char log_level)
+{   
+    LogQueue* queue = CURRENT_QUEUE;
+    // 判断当前日志队列是否已满
+    if (Size(CURRENT_QUEUE) + CURRENT_QUEUE->advance >= CURRENT_QUEUE->capacity)
     {   
-        size_t idx = POP_N % CAPACITY;
-        if (STRING_ARR[idx][LENGTH-1] == 127)
+        // 判断备用日志队列是否为空
+        if (Size(CURRENT_QUEUE) > CURRENT_QUEUE->capacity)
         {   
-            ++POP_N;
-            return STRING_ARR[idx];
+            char s[128];
+            sprintf(s, "BackupQueue push:%lu pop:%lu but CurrentQueue is full push:%lu pop:%lu \n", 
+                    size_t(BACKUP_QUEUE->push_n), size_t(BACKUP_QUEUE->pop_n), 
+                    size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
+            printf(s);
+            throw runtime_error(s);
+        }
+        else if (Size(BACKUP_QUEUE) == 0)
+        {   
+            if (!SWITCHED)
+            {   
+                SWITCHED = true;
+                SwitchQueue();
+                SWITCHED = false;
+            }
+        }
+    }
+
+    size_t str_id = queue->push_n++ % queue->capacity;
+    LogInfo* info = queue->arr + str_id;
+    info->log_level = log_level;
+    return info;
+
+}
+
+const LogInfo* GetWriteString()
+{   
+    LogQueue* queue;
+    if (Size(BACKUP_QUEUE) == 0)
+    {
+        if (EXTEND_BACKUP)
+        {
+            // 对备用队列进行扩容
+            if (Dealloc(BACKUP_QUEUE))
+            {
+                BACKUP_QUEUE->capacity *= 2;
+                BACKUP_QUEUE->advance *= 2;
+                printf("BACKUP_QUEUE %p capacity:%lu length:%lu Advance:%lu\n",
+                        BACKUP_QUEUE, BACKUP_QUEUE->capacity, BACKUP_QUEUE->length, BACKUP_QUEUE->advance);
+                Alloc(BACKUP_QUEUE);
+            }
+            // 标注备用队列信息已写出
+            EXTEND_BACKUP = false;
+        }
+        queue = CURRENT_QUEUE;
+    }
+    else
+    {
+        queue = BACKUP_QUEUE;
+    }
+    // printf("%p push:%lu pop:%lu\n", queue, (size_t)queue->push_n, (size_t)queue->pop_n);
+    // 获取待写出信息
+    if (queue->pop_n < queue->push_n)
+    {   
+        size_t idx = queue->pop_n % queue->capacity;
+        if (queue->arr[idx].confirm)
+        {   
+            ++queue->pop_n;
+            // printf("output %lu:%s", idx, queue->arr[idx]);
+            return queue->arr + idx;
         }
         
     }
     return nullptr;
 }
 
-void ComfirmString(size_t str_id)
+void ComfirmString(LogInfo* info)
 {
-    if (str_id < CAPACITY)
-    {   
-        STRING_ARR[str_id][LENGTH-2] = 0;
-        STRING_ARR[str_id][LENGTH-1] = 127;
-    }
+    info->confirm = true;
+}
+
+void PrintQueue()
+{
+    char s[128];
+    sprintf(s, "BackupQueue:%p push:%lu pop:%lu CurrentQueue:%p push:%lu pop:%lu \n", 
+            BACKUP_QUEUE, size_t(BACKUP_QUEUE->push_n), size_t(BACKUP_QUEUE->pop_n), 
+            CURRENT_QUEUE, size_t(CURRENT_QUEUE->push_n), size_t(CURRENT_QUEUE->pop_n));
+    printf(s);
 }
