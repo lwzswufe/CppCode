@@ -1,0 +1,11 @@
+1 安装CentOS系统开发工具 开发库
+yum groupinstall "Development Tools" "Development Libraries"
+2 下载cmake安装文件包
+wget -c https://github.com/Kitware/CMake/releases/download/v3.17.0-rc3/cmake-3.17.0-rc3.tar.gz
+3 解压
+tar -zxvf cmake-3.17.0-rc3.tar.gz
+4 安装
+cd cmake-3.17.0-rc3
+./bootstrap
+make
+make install

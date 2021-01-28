@@ -9,9 +9,22 @@ MongoDB C驱动安装流程
     mkdir cmake-build
 4 在cmake-build目录下构建项目
     cd cmake-build
-    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release ..
 5 安装驱动
     make && sudo make install
+ 
+安装 MongoDB C驱动过程中可能需要安装的包：
+yum -y install snappy snappy-devel
+yum -y install openssl openssl-devel
+yum -y install libicu-devel
+下载zstd安装包
+wget https://github.com/facebook/zstd/archive/dev.zip
+解压
+unzip dev.zip
+安装
+cd zstd-dev
+make install
+
 
 MongoDB C++驱动安装流程
 参照 https://www.jianshu.com/p/c982a2960175
