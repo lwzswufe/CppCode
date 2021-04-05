@@ -21,7 +21,10 @@ using std::chrono::microseconds;
 #include <deque>
 using std::deque;
 
-#include <windows.h>                            // 引入sleep
+/*
+g++ deque_with_mutex.cpp -l pthread -o deque_with_mutex.o
+*/
+
 
 mutex cout_mutex;                               // 锁 互斥量
 recursive_mutex cout_mutex_r;                   // 可使用 try_lock的互斥量
@@ -63,7 +66,7 @@ int main()
     for (int i=0; i<100; i++)
     {   
         cout_mutex.lock();             // 阻塞等待 cout_mutex被子线程解锁
-        sprintf_s(s,"word_%03d", i);
+        sprintf(s,"word_%03d", i);
         task_deque.push_back(s);
         cout_mutex.unlock();
     }
