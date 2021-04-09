@@ -17,16 +17,20 @@ using std::string;
 using std::chrono::steady_clock;                // 硬件时间
 using std::chrono::time_point;
 using std::chrono::microseconds;
+using std::chrono::milliseconds;
 
 #include <deque>
 using std::deque;
-
-#include <windows.h>                            // 引入sleep
 
 mutex cout_mutex;                               // 锁 互斥量
 recursive_mutex cout_mutex_r;                   // 可使用 try_lock的互斥量
 string global_s;    
 deque<string> task_deque{};                     // 任务队列
+
+
+/*
+g++ Multi_Thread_mutex.cpp -l pthread -o Multi_Thread_mutex.o
+*/
 
 
 void task()
@@ -97,9 +101,9 @@ int main()
     cout << "for start...\n";
     for (int i=0; i<10; i++)
     {   
-        Sleep(1);
+        this_thread::sleep_for(milliseconds{1}); 
         cout_mutex_r.lock();
-        sprintf_s(s,"word_%d\n", i);
+        sprintf(s,"word_%d\n", i);
         task_deque.push_back(s);
         cout_mutex_r.unlock();
     }
