@@ -9,7 +9,8 @@ MongoDB C驱动安装流程
     mkdir cmake-build
 4 在cmake-build目录下构建项目
     cd cmake-build
-    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release -DENABLE_SSL=OPENSSL ..
+    如果出现 SSL disabled的话 则需要安装ssl 命令如下: sudo apt-get install cmake libssl-dev libsasl2-dev
 5 安装驱动
     make && sudo make install
  
@@ -36,7 +37,7 @@ MongoDB C++驱动安装流程
     tar -xzf r3.3.1.tar.gz
 4 创建项目 注意 DCMAKE_INSTALL_PREFIX 用于指定mongo-c-driver安装位置
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local DCMAKE_PREFIX_PATH=/usr/local ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_PREFIX_PATH=/usr/local ..
 5 安装驱动
     make && sudo make install
     安装过程中若提示  MNMLSTC 安装出现问题 请输入 sudo make EP_mnmlstc_core

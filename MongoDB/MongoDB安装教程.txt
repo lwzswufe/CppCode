@@ -47,6 +47,8 @@ CentOS系统MongoDB离线安装教程 参照 https://juejin.im/post/5cbe73f86fb9
 
 5 端口检查
   netstat -natp | grep 27017
+  若未开启端口 使用一下命令开启端口
+  firewall-cmd --zone=public --add-port=27017/tcp --permanent
 
 6 检查MongoDB是否在运行
   ps -aux | grep mongod    # 查看数据库的进程是否存在
