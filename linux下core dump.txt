@@ -1,0 +1,3 @@
+ulimit -c  查看当前core dump文件大小(kb) 为0表示关闭
+ulimit -c 1024  设置当前core dump文件大小 为 1024kb
+gdb ./usr_prog core.xxx  使用gdb 以及core dump文件core.xxx 查看用户程序usr_prog崩溃的地方
