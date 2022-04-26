@@ -1,0 +1,27 @@
+Ubuntu
+
+sudo apt-get install libgtest-dev
+
+CentOS
+
+下载gtest，release-1.8.0
+
+       git clone https://github.com/google/googletest
+
+gtest编译
+
+　　cd googletest
+
+生成Makefile文件(先安装cmake，brew install cmake)，继续输入命令编译:
+
+　　cmake CMakeLists.txt
+
+执行make，生成两个静态库：libgtest.a libgtest_main.a
+
+　　make
+
+拷贝到系统目录，注意，如果下诉目录位置在不同版本位置有变动，用find . -name "libgtest*.a" 找到位置
+
+       sudo cp libgtest*.a  /usr/lib
+
+　　sudo cp –a include/gtest /usr/include
