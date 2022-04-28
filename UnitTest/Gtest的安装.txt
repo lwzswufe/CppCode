@@ -3,25 +3,20 @@ Ubuntu
 sudo apt-get install libgtest-dev
 
 CentOS
+当前最新版1.11.0不支持CentOS的GCC4.8.5，故使用1.8.1版本
+下载gtest： 
+    wget https://github.com/google/googletest/archive/refs/tags/release-1.8.1.zip
+或手动下载 https://github.com/google/googletest/releases:
 
-下载gtest，release-1.8.0
+解压:
+    tar -xvf googletest-release-1.8.1.tar.gz
 
-       git clone https://github.com/google/googletest
-
-gtest编译
-
+gtest编译:
+    cd googletest-release-1.8.1
 　　cd googletest
-
-生成Makefile文件(先安装cmake，brew install cmake)，继续输入命令编译:
-
-　　cmake CMakeLists.txt
-
-执行make，生成两个静态库：libgtest.a libgtest_main.a
-
-　　make
-
-拷贝到系统目录，注意，如果下诉目录位置在不同版本位置有变动，用find . -name "libgtest*.a" 找到位置
-
-       sudo cp libgtest*.a  /usr/lib
-
-　　sudo cp –a include/gtest /usr/include
+    mkdir build          # Create a directory to hold the build output.
+    cd build
+    cmake ..             # Generate native build scripts for GoogleTest.
+    make
+安装:
+    make install
