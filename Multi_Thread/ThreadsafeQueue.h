@@ -13,11 +13,15 @@ private:
         std::shared_ptr<T> data;
         std::unique_ptr<node> next;
     };
-    
+    // 头节点锁
     std::mutex head_mutex;
+    // 头节点
     std::unique_ptr<node> head;
+    // 尾节点锁
     std::mutex tail_mutex;
+    // 尾节点
     node* tail;
+    // 大小
     int _size{0};
     // 获取尾节点
     node* get_tail()
@@ -40,12 +44,9 @@ private:
         --_size;
         return old_head;
     }
-        
-
 public:
-    ThreadsafeQueue():
-        head(new node),tail(head.get())
-    {}
+    // 默认构造函数
+    ThreadsafeQueue(): head(new node),tail(head.get()) {}
     // 禁止拷贝构造
     ThreadsafeQueue(const ThreadsafeQueue& other)=delete;
     // 禁止赋值构造
@@ -56,7 +57,7 @@ public:
         std::unique_ptr<node> old_head=pop_head();
         return old_head?old_head->data:std::shared_ptr<T>();
     }
-    //
+    // 获取大小
     int size()
     {   
         return _size;
@@ -64,7 +65,7 @@ public:
     // 是否为空
     bool empty()
     {   
-        printf("%p %p\n", head.get(), get_tail());
+        // printf("%p %p\n", head.get(), get_tail());
         return head.get()==get_tail();
     }
     // 推入数据
