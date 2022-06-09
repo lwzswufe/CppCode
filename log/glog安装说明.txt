@@ -27,3 +27,10 @@
     cmake --build build --target test
 5 安装
     sudo cmake --build build --target install
+  
+重新编译安装glog
+1 进入项目目录
+2 build
+    cmake --build build
+3 安装
+    sudo cmake --build build --target install
