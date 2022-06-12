@@ -34,3 +34,5 @@
     cmake --build build
 3 安装
     sudo cmake --build build --target install
+
+生成的program.ERROR 文件是实际日志文件的软链接
