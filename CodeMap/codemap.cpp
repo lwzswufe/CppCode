@@ -1,39 +1,3 @@
-#include <stdio.h>
-#include <string>
-#include <stdlib.h>
-#define CODEARRSIZE 7000
-
-int code2pos(const char * code)
-{    // 证券代码字符串转化为数组坐标 效率是map<string，int>的5倍
-    int head = (code[0] - 48) * 10 + (code[2] - 48);
-    int bias, pos;
-    switch (head)
-    {
-    case 0:                                                     // 000XXX
-        bias = 0;   break;
-    case 1:                                                     // 001XXX
-        bias = 1000;break;
-    case 2:                                                     // 002XXX
-        bias = 2000;break;
-    case 30:                                                    // 300XXX
-        bias = 3000;break;
-    case 60:                                                    // 600XXX 
-        bias = 4000;break;
-    case 61:                                                    // 601XXX
-        bias = 5000;break;
-    case 63:                                                    // 603XXX
-        bias = 6000;break;
-    default:
-        return 0;
-    }
-    // pos = atoi(code) - bias;
-    pos = bias + (code[3] - 48) * 100 + (code[4] - 48) * 10 + (code[5] - 48);
-    if (pos < 0 || pos > CODEARRSIZE)
-        return 0;
-    else
-        return pos;
-}
-
 #include <time.h> 
 #include <sys/time.h>
 #include <string>
@@ -48,35 +12,81 @@ using std::ifstream;
 #include <sstream>
 using std::istringstream;
 
-double getTime() 
-{   // 获取精确到毫秒的时间
-    struct timeval    tv; 
-    struct timezone   tz; 
-    struct tm         *p; 
-       
-    gettimeofday(&tv, &tz);
-       
-    p = localtime(&tv.tv_sec); 
-    return  p->tm_hour*3600+p->tm_min * 60 + p->tm_sec + tv.tv_usec / 1000000.0; 
+
+#include <chrono>
+using std::chrono::steady_clock;                // 硬件时间
+using std::chrono::time_point;
+using std::chrono::duration;                    // 时间段
+using std::chrono::system_clock;                // 系统时间
+using std::chrono::duration_cast;               // 时间类型转换
+#include "Code2Pos1.h"
+#include "Code2Pos2.h"
+#include "Code2Pos3.h"
+
+/*
+g++ -std=c++11 Code2Pos1.h Code2Pos2.h Code2Pos3.h Code2Pos1.cpp Code2Pos2.cpp Code2Pos3.cpp codemap.cpp -o codemap.out
+*/
+steady_clock::time_point GetTime() 
+{
+    steady_clock::time_point time_ed = steady_clock::now();
 } 
 
-void test_1(vector<string> code_list, int * arr)
+int64_t DiffTime(const steady_clock::time_point &time_st, const steady_clock::time_point &time_ed)
 {
-    for (string code: code_list)
-        arr[code2pos(code.c_str())];
+    steady_clock::duration d1 = time_ed - time_st;
+    return d1.count();
 }
 
-void test_2(vector<string> code_list, map<string, int> &code_map)
+void test_1(vector<string>& code_list, map<string, int> &code_map)
 {
     for (string code: code_list)
-        code_map[code];
+    {
+        map<string, int>::iterator iter = code_map.find(code);
+    }
 }
 
-vector<string> read_codelist()
+void InitialCodeMap(vector<string>& code_list, map<string, int> &code_map, int limit)
 {   
-    ifstream file_codelist("Codelist.txt");
+    int count{0};
+    for (string code: code_list)
+    {
+        map<string, int>::iterator iter = code_map.find(code);
+        if (iter == code_map.end())
+        {
+            code_map[code] = 1;
+        }
+        if (++count > limit)
+            break;
+    }
+    printf("load %d data code_map size:%lu\n", count, code_map.size());
+}
+
+
+void test_2(vector<string>& code_list)
+{
+    for (string code: code_list)
+        int pos = Code2Pos1::FindCode(code.c_str());
+}
+
+void test_3(vector<string>& code_list)
+{
+    for (string code: code_list)
+        int pos = Code2Pos2::FindCode(code.c_str());
+}
+
+void test_4(vector<string>& code_list)
+{
+    for (string code: code_list)
+        int pos = Code2Pos3::FindCode(code.c_str());
+}
+
+vector<string> ReadCodelist(int limit)
+{   
+    steady_clock::time_point time_st = GetTime();
+    ifstream file_codelist("codelist.txt");
     const size_t line_size = 1024;
     char line_c[line_size];
+    int count{0};
     vector<string> code_list;
     istringstream line_in;
     if (file_codelist.bad())
@@ -85,43 +95,53 @@ vector<string> read_codelist()
         printf("fail in open file codelist");
 
     file_codelist.getline(line_c, line_size);
-    while((!file_codelist.eof())&&(!file_codelist.fail()))
+    while((!file_codelist.eof())&&(!file_codelist.fail()) && (++count <= limit))
     {
         string code{line_c, line_c + 6};
-        if (code.size() == 6 && (code[0] == '0' || code[0] == '3' || code[0] == '6'))
+        if (code.size() == 6)
         {   
             code_list.push_back(code);
         }
-        else if(code != "codeli")
-            ;
         file_codelist.getline(line_c, line_size);
     }
-    printf("code list size:%ld\n", code_list.size());
+    steady_clock::time_point time_ed = GetTime();
+    double useTime =DiffTime(time_st, time_ed) / 1000000000.0;
+    printf("code list size:%ld used:%.3lfs\n", code_list.size(), useTime);
     return code_list;
 }
 
 int main()
 {   
-    int arr[CODEARRSIZE];
-    int cycle_times = 1000, map_size=500;
-    vector<string> code_list = read_codelist();
-    map<string, int> code_map;
-    double st_time;
-    int i = 0, size = code_list.size();
-    while (code_map.size() < map_size)
-    {   
-        i+=47;
-        if (i >= size)
-            i -= size;
-        code_map[code_list[i]] = 0;
-    }
-    st_time = getTime();
-    for (int i=0; i<cycle_times; i++)
-        test_1(code_list, arr);
-    printf("test1 used:%.3lfs\n", getTime() - st_time);
-    st_time = getTime();
-    for (int i=0; i<cycle_times; i++)
-        test_2(code_list, code_map);
-    printf("test2 used:%.3lfs\n", getTime() - st_time);
+    int limit{13000 * 10000};
+    vector<string> code_list = ReadCodelist(limit);
+    double size = code_list.size();
+    map<string, int> code_map{};
+    steady_clock::time_point time_st, time_ed;
+    InitialCodeMap(code_list, code_map, 2 * 10000);
+    time_st = GetTime();
+    test_1(code_list, code_map);
+    time_ed = GetTime();
+    printf("test map       avg:%.4lfns used:%.3lfs\n", DiffTime(time_st, time_ed) / size, DiffTime(time_st, time_ed) / 1000000000.0);
+
+    Code2Pos1::InitialSearchTable();
+    time_st = GetTime();
+    test_2(code_list);
+    time_ed = GetTime();
+    printf("test code arr1 avg:%.4lfns used:%.3lfs\n", DiffTime(time_st, time_ed) / size, DiffTime(time_st, time_ed) / 1000000000.0);
+    Code2Pos1::ReleaseSearchTable();
+
+    Code2Pos2::InitialSearchTable();
+    time_st = GetTime();
+    test_3(code_list);
+    time_ed = GetTime();
+    printf("test code arr2 avg:%.4lfns used:%.3lfs\n", DiffTime(time_st, time_ed) / size, DiffTime(time_st, time_ed) / 1000000000.0);
+    Code2Pos2::ReleaseSearchTable();
+    
+    Code2Pos3::InitialSearchTable();
+    time_st = GetTime();
+    test_4(code_list);
+    time_ed = GetTime();
+    printf("test code arr3 avg:%.4lfns used:%.3lfs\n",  DiffTime(time_st, time_ed) / size, DiffTime(time_st, time_ed) / 1000000000.0);
+    Code2Pos3::ReleaseSearchTable();
     return 0;
 }
