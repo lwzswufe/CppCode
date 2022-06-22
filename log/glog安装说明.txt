@@ -1,0 +1,38 @@
+安装gflag
+1 下载 https://codeload.github.com/gflags/gflags/tar.gz/refs/tags/v2.2.2
+  解压
+  tar xzf gflags-2.2.2-source.tar.gz
+  切换目录
+  cd gflags-2.2.2
+2 创建build目录
+  mkdir build && cd build
+3 cmake 
+  cmake ..
+4 编译
+  make
+5 安装
+  make install
+
+安装glog
+1 下载 https://codeload.github.com/google/glog/tar.gz/refs/tags/v0.6.0
+  解压
+    tar -xvf glog-0.6.0.tar.gz
+  切换目録
+    cd glog-0.6.0
+2 运行 CMake
+    cmake -S . -B build -G "Unix Makefiles"
+3 build
+    cmake --build build
+4 测试 (可选)
+    cmake --build build --target test
+5 安装
+    sudo cmake --build build --target install
+  
+重新编译安装glog
+1 进入项目目录
+2 build
+    cmake --build build
+3 安装
+    sudo cmake --build build --target install
+
+生成的program.ERROR 文件是实际日志文件的软链接
