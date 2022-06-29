@@ -1,0 +1,11 @@
+1 下载1.8.0版本spdlog https://github.com/gabime/spdlog/releases
+2 解压
+    tar -xvf spdlog.tar
+3 创建build目录
+    cd spdlog
+    mkdir build
+4 安装
+    cd build
+    cmake ..
+    make -j
+    make install
