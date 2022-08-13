@@ -3,7 +3,7 @@
 #include <mysql/mysql.h>
 
 /*
-gcc demo.cpp -o demo.out `mysql_config --cflags --libs` -L/usr/lib64/mysql
+gcc -std=c++11 demo.cpp -o demo.out `mysql_config --cflags --libs` -L/usr/lib64/mysql
 */
 
 int main(int argc, char **argv)
@@ -118,8 +118,35 @@ int main(int argc, char **argv)
         fprintf(stderr, "Failed to query:%s: Error: %s\n", query_str2,
             mysql_error(&mysql));
     }
+    // 插入数据 fcode, fdatetime, b1pr, b1vol 
+    char insert_str[1024]{"INSERT INTO `ticklevel` (`fcode`, `fdatetime`, `b1pr`, `b1vol`) VALUES ('100001', '2022-07-18 10:25:00', 13.31, 1478);"};
+    res = mysql_query(&mysql, insert_str);
+    if (res != 0)
+    {
+        fprintf(stderr, "Failed to query:%s: Error: %s\n", insert_str,
+                mysql_error(&mysql));
+    }
+    else
+    {   // 提交
+        mysql_commit(&mysql);
+    }
+     // 批量插入数据 fcode, fdatetime, b1pr, b1vol 
+    char insert_str2[1024]{"INSERT INTO `ticklevel` (`fcode`, `fdatetime`, `b1pr`, `b1vol`) VALUES ('100002', '2022-07-18 10:21:00', 13.31, 1478), "
+                           "('100003', '2022-07-18 10:22:00', 13.31, 1478), ('100004', '2022-07-18 10:23:00', 13.31, 1478);"};
+    res = mysql_query(&mysql, insert_str2);
+    if (res != 0)
+    {
+        fprintf(stderr, "Failed to query:%s: Error: %s\n", insert_str2,
+                mysql_error(&mysql));
+    }
+    else
+    {   // 提交
+        mysql_commit(&mysql);
+    }
     // 关闭连接
     mysql_close(&mysql);
+    // 关闭对mysql动态库的使用
+    mysql_library_end();
     exit(0);
 
     return 0;
