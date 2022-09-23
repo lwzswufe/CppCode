@@ -1,0 +1,1 @@
+redis-cli -h $1 -p $2 --tls --cert redis_tls/redis.crt --key redis_tls/redis.key --cacert redis_tls/ca.crt

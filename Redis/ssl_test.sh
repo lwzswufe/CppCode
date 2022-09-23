@@ -1,0 +1,1 @@
+openssl s_client -host $1 -port $2 -msg -state -showcerts -cert certs/client-cert.pem -key certs/client-key.pem

@@ -1,0 +1,39 @@
+一 安装Redis
+1 下周Redis安装包 https://redis.io/download/
+2 解压 tar -xvf redis.tar.gz
+3 进入解压后的文件编译 make BUILD_TLS=yes
+4 安装 make install
+5 创建redis服务的配置文件
+  cp utils/redis_init_script /etc/rc.d/init.d/redis
+  修改刚刚复制的redis文件 参照https://www.jianshu.com/p/e25dab3bd0e7
+  主要检查以下几项
+  EXEC= redis的服务端安装目录
+  CLIEXEC= redis的客户端安装目录
+  CONF= redis的配置文件目录
+6 将redis注册为服务service  chkconfig --add redis
+7 使用 redis-cli -p 6379 验证登陆
+8 创建密钥 使用安装目录下的脚本创建密钥、证书 sh utils/gen-test-certs.sh
+9 拷贝上述密钥到 /etc/redis_tls/ 并修改redis.conf 文件，添加以下信息
+  ################################## TLS 配置 ###################################
+  tls-port 6380
+  tls-cert-file /etc/redis_tls/redis.crt
+  tls-key-file /etc/redis_tls/redis.key
+  tls-ca-cert-file /etc/redis_tls/ca.crt
+  tls-dh-params-file /etc/redis_tls/redis.dh
+  tls-auth-clients yes
+  tls-replication yes
+10 使用connect.sh IP post 验证连接
+
+
+注意 外网SSL连接注意事项:
+1 修改/etc/redis.conf 的IP绑定参数 bind 0.0.0.0
+2 防火墙开通6380端口 云服务管理窗口也需开通6380端口
+
+二 安装支持SSL的Hiredis
+1 下载驱动源码https://github.com/redis/hiredis
+2 解压
+3 进入解压后的文件夹
+4 创建build目录
+5 cmake ..
+6 make USE_SSL=1
+7 make install USE_SSL=1
