@@ -58,6 +58,82 @@ int main(int argn, char** argv)
         freeReplyObject(reply);
     }
 
+    /* RPUSH */
+    char listName[32] {"list"};
+    for (int i=0; i<5; ++i)
+    {
+        char value[32];
+        sprintf(value, "user%03d", i+101);
+        reply = (redisReply *)redisCommand(client,"RPUSH %s %s", listName, value);
+        printf("RPUSH %s %s\n", listName, value);
+        freeReplyObject(reply);
+    }
+    /* LRANGE */
+    reply = (redisReply *)redisCommand(client,"LLEN %s", listName);
+    if (reply != nullptr)
+    {
+        printf("len:%lld\n", reply->integer);
+        int len = reply->integer;
+        int start{0}, end{len};
+        redisReply * replyRange =  (redisReply *)redisCommand(client,"LRANGE %s %d %d", listName, start, end);
+        if (replyRange != nullptr)
+        {
+            size_t size = replyRange->elements;
+            redisReply ** replyArr = replyRange->element;
+            printf("size:%lu arr:%p\n", size, replyArr);
+            for (unsigned i=0; i<size; ++i)
+            {
+                printf("Arr[%u] = %s\n", i, replyArr[i]->str);
+            }
+            freeReplyObject(replyRange);
+        }
+    }
+    freeReplyObject(reply);
+    /* LPOP */
+    reply = (redisReply *)redisCommand(client,"LPOP %s", listName);
+    while(reply != nullptr && reply->str != nullptr)
+    {
+        printf("LPOP %s %s\n", listName, reply->str);
+        freeReplyObject(reply);
+        reply = (redisReply *)redisCommand(client,"LPOP %s", listName);
+    }
+    if (reply != nullptr)
+    {
+        printf("reply:%p  str:%p\n", reply, reply->str);
+        freeReplyObject(reply);
+    }
+    else
+    {
+        printf("reply: nullptr\n");
+    }
+    /* HSET */
+    char hashName[32] {"hmap"};
+    for (int i = 0; i < 5; i++)
+    {
+        char fieldName[32], value[32];
+        sprintf(fieldName, "%06d", i+1);
+        sprintf(value, "data%d", i+1);
+        reply = (redisReply *)redisCommand(client,"HSET %s %s %s", hashName, fieldName, value);
+        if (reply != nullptr)
+        {
+            printf("HSET %s[%s] = %s\n", hashName, fieldName, value);
+            freeReplyObject(reply);
+        }
+    }
+    
+    /* GSET */
+    for (int i = 0; i < 5; i++)
+    {
+        char fieldName[32];
+        sprintf(fieldName, "%06d", i+1);
+        reply = (redisReply *)redisCommand(client,"HGET %s %s", hashName, fieldName);
+        if (reply != nullptr)
+        {
+            printf("HGET %s[%s] = %s\n", hashName, fieldName, reply->str);
+            freeReplyObject(reply);
+            
+        }
+    }
     redisFree(client);
     return 0;
 }
