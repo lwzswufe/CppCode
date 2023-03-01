@@ -1,4 +1,5 @@
 #include "MongoDBWriter.h"
+using bsoncxx::builder::basic::sub_array;
 
 
 void MongoDBWriter::Insert_One(const Data* data)
@@ -51,6 +52,25 @@ void MongoDBWriter::Insert_Many(const Data* data, int num)
     }
     auto res = _Collection.insert_many(DocVec);
     printf("%s[%s] Insert %d Data\n", _BaseName, _CollectionName, res.value().inserted_count());
+}
+
+// 插入数据
+void MongoDBWriter::Insert_List(const Data* data, std::vector<int> vec)
+{
+    bsoncxx::document::value doc = make_document(
+            kvp("_id",  100),
+            kvp("Name", data->Name),
+            kvp("Code", data->Code), 
+            kvp("Arr", [&vec](sub_array child) 
+                        {
+                            for (const auto& element : vec) {
+                                child.append(element);
+                            }
+                        })
+                );
+    // std::cout << bsoncxx::to_json(doc.view()) << std::endl;
+    auto res = _Collection.insert_one(doc.view());
+    std::cout << "InsertNum:" << res.value().result().inserted_count() << std::endl;
 }
 
 void MongoDBWriter::Update_One(const Data* data)

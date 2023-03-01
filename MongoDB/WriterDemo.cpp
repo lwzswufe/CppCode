@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     if (argc < 5)
         writer.Login(argv[1], argv[2], nullptr, nullptr);
     else 
-        writer.Login(argv[1], argv[2], argv[3], argv[4]);
+        writer.Login(argv[3], argv[4], argv[1], argv[2]);
     // 选择数据库 数据表
     writer.SelectCollection("testdb", "testco");
     // 清除所有数据
@@ -42,6 +42,9 @@ int main(int argc, char* argv[])
     // 更新
     Data data{3, "Cindy"};
     writer.Update_One(&data);
+    // 数组
+    std::vector<int> vec{1,3,5,7,9};
+    writer.Insert_List(&data, vec);
     // 登出
     writer.Logout();
     return 0;
