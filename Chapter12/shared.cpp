@@ -18,6 +18,13 @@ using std::shared_ptr;using std::make_shared;
 #define print(x) cout << #x << ": " << x << endl; 
 #define prints(x, y) cout << #x << ": " << x << endl << #y << ": " << y << endl;
 
+
+struct A
+{
+    int x;
+    double y;
+    char z[8];
+};
 int main()
 {
     shared_ptr<string> p1;
@@ -90,6 +97,22 @@ int main()
     //*p1 = "hi";
     //cout << *p1 << endl;
 
-
+    shared_ptr<A> pa = make_shared<A>();
+    // 直接修改pa对应的数据
+    sprintf((char*)pa.get() + 16, "%06d", 1547);
+    // memset(pa, 0, sizeof(A));
+    cout << "size struct A :" << sizeof(A) << endl
+         << "size shared_ptr :" << sizeof(pa) << endl
+         << "size *shared_ptr :" << sizeof(*pa) << endl
+         << "x=" << pa->x << endl 
+         << "y=" << pa->y << endl
+         << "z=" << pa->z << endl
+         << "ref: " << pa.use_count() << endl;
+    shared_ptr<const A> pc = pa;
+    cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
+    pa.reset();                 // 释放pa
+    cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
+    pc.reset();
+    cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
     return 0;
 }
