@@ -25,6 +25,33 @@ struct A
     double y;
     char z[8];
 };
+
+struct B                // 析构时不释放shared_ptr
+{
+    B(){type = 0; x=0;};
+    ~B(){};
+    char type; // 'i': int  's': shared_ptr<int> 'd':double
+    union
+    {
+        int x;
+        shared_ptr<int> y;
+        double z;
+    };
+};
+
+struct C                // 析构时释放shared_ptr
+{
+    C(){type = 0; x=0;};
+    ~C(){if (type=='s' && y != nullptr) y.reset();};
+    char type; // 'i': int  's': shared_ptr<int> 'd':double
+    union
+    {
+        int x;
+        shared_ptr<int> y;
+        double z;
+    };
+};
+
 int main()
 {
     shared_ptr<string> p1;
@@ -108,11 +135,36 @@ int main()
          << "y=" << pa->y << endl
          << "z=" << pa->z << endl
          << "ref: " << pa.use_count() << endl;
-    shared_ptr<const A> pc = pa;
+    shared_ptr<const A> pc = pa;                // const A的share指针与 A的share指针共享计数
     cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
+    cout << "release" << endl;
     pa.reset();                 // 释放pa
     cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
+    cout << "release" << endl;
     pc.reset();
     cout << "ref: " << pa.use_count() << ", " << pc.use_count() << endl;
+
+    // UNION 释放测试
+    cout << "union release test 1" << endl;
+    shared_ptr<int> si = make_shared<int>(7);
+    B* b = new B;
+    cout << "ref: " << si.use_count() << endl;
+    b->type = 's';
+    b->y = si;
+    cout << "ref: " << si.use_count() << "," << b->y.use_count() << endl;
+    cout << "release" << endl;
+    delete b;           // 释放b 但是 关联的shared_ptr 未释放
+    cout << "ref: " << si.use_count() << " release failed"<< endl;
+    // union 释放测试
+    cout << "union release test 2" << endl;
+    shared_ptr<int> si2 = make_shared<int>(7);
+    C* c = new C;
+    cout << "ref: " << si2.use_count() << endl;
+    c->type = 's';
+    c->y = si2;
+    cout << "ref: " << si2.use_count() << "," << c->y.use_count() << endl;
+    cout << "release" << endl;
+    delete c;           // 释放b 但是 关联的shared_ptr 未释放
+    cout << "ref: " << si2.use_count() << " release successful" << endl;
     return 0;
 }
