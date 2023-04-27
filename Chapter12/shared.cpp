@@ -154,7 +154,13 @@ int main()
     cout << "ref: " << si.use_count() << "," << b->y.use_count() << endl;
     cout << "release" << endl;
     delete b;           // 释放b 但是 关联的shared_ptr 未释放
-    cout << "ref: " << si.use_count() << " release failed"<< endl;
+    bool is_null = si == nullptr;
+    cout << "ref: " << si.use_count() << " release failed" << " shared_ptr==nullptr: " << is_null << endl;
+    cout << "shared_ptr = nullptr" << endl; // 让shared_ptr=nullptr 会减少引用计数
+    si = nullptr;
+    is_null = si == nullptr;
+    const int* ci = si.get();   // 资源释放后 get的指针为nullptr
+    cout << "ref: " << si.use_count() << " release successful" << " shared_ptr==nullptr: " << is_null << " .get():" << ci << endl;
     // union 释放测试
     cout << "union release test 2" << endl;
     shared_ptr<int> si2 = make_shared<int>(7);
