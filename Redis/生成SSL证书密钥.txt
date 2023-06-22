@@ -1,0 +1,43 @@
+生成 RSA 私有秘钥
+-out filename ：将生成的私钥保存至filename文件，若未指定输出文件，则为标准输出。
+-numbits ：指定要生成的私钥的长度（单位 bit），默认为1024。该项必须为命令行的最后一项参数。
+
+第一步就是先创建出私钥pri_key.pem
+openssl genrsa -out pri_key.pem
+
+第二步根据私钥pri_key.pem生成一个新的证书请求文件
+openssl req -new -key pri_key.pem -subj '/O=Redis Test/CN=Certificate Authority' -out req1.csr
+
+
+openssl genrsa -out wyf.key 4096
+
+openssl req命令主要的功能有，生成证书请求文件， 查看验证证书请求文件，还有就是生成自签名证书
+-new    :说明生成证书请求文件
+-x509   :说明生成自签名证书
+-key    :指定已有的秘钥文件生成秘钥请求，只与生成证书请求选项-new配合。
+-nodes  :如果指定-newkey自动生成秘钥，那么-nodes选项说明生成的秘钥不需要加密，即不需要输入passphase. 
+-subj arg
+
+用于指定生成的证书请求的用户信息，或者处理证书请求时用指定参数替换。生成证书请求时，如果不指定此选项，程序会提示用户来输入各个用户信息，包括
+C是Country、ST是state、L是localcity、O是Organization、OU是Organization Unit、CN是common name等
+如果采用此选择，则不需要用户输入了。
+openssl req \
+    -x509 -new -nodes -sha256 \
+    -key ca.key \
+    -days 3650 \
+    -subj '/O=Redis Test/CN=Certificate Authority' \
+    -out ca.crt
+openssl genrsa -out redis.key 2048
+openssl req \
+    -new -sha256 \
+    -key redis.key \
+    -subj '/O=Redis Test/CN=Server' | \
+    openssl x509 \
+    -req -sha256 \
+    -CA ca.crt \
+    -CAkey ca.key \
+    -CAserial ca.txt \
+    -CAcreateserial \
+    -days 3650 \
+    -out redis.crt
+openssl dhparam -out redis.dh 2048

@@ -4,7 +4,9 @@
 #include <x86intrin.h>
 
 /*
-g++ -std=c++11  publish.h publish.cpp testPublish.cpp -o publish.out -I /usr/local/include/hiredis -lhiredis -levent -lpthread
+g++ -std=c++11  publish.h publish.cpp testPublish.cpp -o publish.out \
+-I /usr/local/include/hiredis -lhiredis -levent -lpthread -Wl,-rpath=/usr/local/lib
+需要安装libev和libevent两个事件库
 */
 void CallBackFun(const char* channel, const char* message, int len)
 {
@@ -34,7 +36,7 @@ inline uint64_t GetCurrentCycle()
 
 int main()
 {
-    const char channel[32]{"Timer"};
+    const char channel[32]{"Timer"}, key[32]{"test_list"};
     CRedisPublisher pub;
     pub.Init();
     pub.Connect();
@@ -48,6 +50,7 @@ int main()
         timestr[63] = 0;
         printf("%s\n", timestr);
         pub.Publish(channel, timestr);
+        pub.Push(key, timestr);
         usleep(1000 * 1000);
     }
     pub.Disconnect();

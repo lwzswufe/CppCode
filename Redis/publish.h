@@ -33,9 +33,9 @@ public:
     // 断开连接
     bool Disconnect();
     // 发布信息
-    bool Publish(const std::string &channel_name, 
-        const std::string &message);
- 
+    bool Publish(const std::string &channel_name, const std::string &message);
+    // 添加数据
+    bool Push(const std::string &key, const std::string &message);
 private:
      // 下面三个回调函数供redis服务调用
     // 连接回调
@@ -64,6 +64,8 @@ private:
     sem_t _event_sem;
 	// hiredis异步对象
     redisAsyncContext *_redis_context;
+    // hiredis同步对象
+    redisContext * _client{nullptr};
 };
  
 #endif

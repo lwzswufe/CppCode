@@ -1,16 +1,17 @@
 1 下载驱动源码https://github.com/redis/hiredis
 2 解压
 3 进入解压后的文件夹
-4 创建build目录
-5 cmake ..
-6 make    注意 此处如果需要SSL支持 应当输入make USE_SSL=1
-7 make install 注意 此处如果需要SSL支持 应当输入make install USE_SSL=1
+4 打开CMakeLists.txt 修改ENABLE_SSL的值为ON (默认值OFF)
+5 创建build目录
+6 cmake ..
+7 make    注意 此处如果需要SSL支持 应当输入make USE_SSL=1
+8 make install 注意 此处如果需要SSL支持 应当输入make install USE_SSL=1
 
 注意
 库文件目录 /usr/local/lib  库名称hiredis
 头文件目录 /usr/local/include/hiredis
 
-若使用订阅-发布模式需要安装openssl 与 libssl_dev两个库 再安装liblevel
+若使用订阅-发布模式需要安装openssl 与 libssl_dev(CentOs里安装openssl_devel)两个库 再安装liblevel
 查看openssl 版本 openssl version
 1 下载源码 https://github.com/libevent/libevent
 2 解压

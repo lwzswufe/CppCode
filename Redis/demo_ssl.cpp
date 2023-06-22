@@ -30,7 +30,7 @@ int main(int argn, char** argv)
         exit(1);
     }
 
-    struct timeval tv = { 1, 500000 }; // 1.5 seconds
+    struct timeval tv = { 3, 500000 }; // 1.5 seconds
     redisOptions options = {0};
     REDIS_OPTIONS_SET_TCP(&options, hostname, port);
     options.connect_timeout = &tv;
@@ -54,7 +54,7 @@ int main(int argn, char** argv)
     }
 
     /* Set */
-    reply = (redisReply *)redisCommand(client,"SET %s %s", "welcome", "Hello, DCS for Redis!");
+    reply = (redisReply *)redisCommand(client,"SET %s %s", "welcome", "Hello, DCS for SSL Redis!");
     if (reply == nullptr)
         printf("error in Set Data\n");
     else

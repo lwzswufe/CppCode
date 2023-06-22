@@ -44,6 +44,8 @@ bool CRedisPublisher::Uninit()
 bool CRedisPublisher::Connect()
 {
     // connect redis
+    struct timeval timeout = { 1, 500000 }; // 1.5 seconds
+    _client = redisConnect("127.0.0.1", 6379);
     _redis_context = redisAsyncConnect("127.0.0.1", 6379);    // 异步连接到redis服务器上，使用默认端口
     if (NULL == _redis_context)
     {
@@ -111,6 +113,14 @@ bool CRedisPublisher::Publish(const std::string &channel_name,
     return true;
 }
  
+// 添加数据
+bool CRedisPublisher::Push(const std::string &key, const std::string &message)
+{
+    redisReply *reply = (redisReply *)redisCommand(_client,"RPUSH %s %s", key.c_str(), message.c_str());
+    freeReplyObject(reply);
+    return true;
+}
+
 void CRedisPublisher::ConnectCallback(const redisAsyncContext *redis_context,
     int status)
 {

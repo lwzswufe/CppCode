@@ -3,7 +3,8 @@
 #include <x86intrin.h>
 
 /*
-g++ -std=c++11  publish.h subscribe.h publish.cpp subscribe.cpp testSubscribe.cpp -o subscribe.out -I /usr/local/include/hiredis -lhiredis -levent -lpthread
+g++ -std=c++11  publish.h subscribe.h publish.cpp subscribe.cpp testSubscribe.cpp \
+-o subscribe.out -I /usr/local/include/hiredis -lhiredis -levent -lpthread -Wl,-rpath=/usr/local/lib
 */
 
    
