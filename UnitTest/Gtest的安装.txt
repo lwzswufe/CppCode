@@ -20,3 +20,7 @@ gtest编译:
     make
 安装:
     make install
+手动安装:
+    cp *.a /usr/local/lib
+    cd ..
+    cp -R include/gtest /usr/local/include/gtest

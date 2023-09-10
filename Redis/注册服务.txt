@@ -1,0 +1,12 @@
+# 复制redis服务启动文件
+cd utils/
+cp redis_init_script /etc/rc.d/init.d/redis
+ls /etc/rc.d/init.d/
+vi /etc/rc.d/init.d/redis 在第23行的$EXEC $CONF后添加 &  
+# 拷贝配置文件
+cd ..
+cp redis.conf /etc/redis/6379.conf
+ls /etc/redis
+# 启动服务
+service redis start
+ps -aux | grep redis

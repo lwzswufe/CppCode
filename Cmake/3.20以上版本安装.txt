@@ -1,0 +1,6 @@
+1 下载指定版本 https://github.com/Kitware/CMake/releases
+2 解压
+3 拷贝解压后的文件到 /usr/local/
+   cp -R cmake-3.20.4-linux-x86_64 /usr/local/cmake
+4 创建软连接
+    ln -sf /usr/local/cmake/bin/* /usr/bin/

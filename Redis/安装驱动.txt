@@ -11,7 +11,7 @@
 库文件目录 /usr/local/lib  库名称hiredis
 头文件目录 /usr/local/include/hiredis
 
-若使用订阅-发布模式需要安装openssl 与 libssl_dev(CentOs里安装openssl_devel)两个库 再安装liblevel
+若使用订阅-发布模式需要安装openssl 与 libssl_dev(CentOs里安装openssl-devel)两个库 再安装liblevel
 查看openssl 版本 openssl version
 1 下载源码 https://github.com/libevent/libevent
 2 解压
