@@ -58,6 +58,17 @@ int main(int argn, char** argv)
         freeReplyObject(reply);
     }
 
+    /* Get no Data */
+    reply = (redisReply *)redisCommand(client,"GET welcome2");
+    if (reply == nullptr)
+        printf("error in Set Data\n");
+    else
+    {   
+        // 没有数据时 reply->str为空指针
+        printf("GET welcome2 (no data): %s\n", reply->str);
+        freeReplyObject(reply);
+    }
+
     /* RPUSH */
     char listName[32] {"list"};
     for (int i=0; i<5; ++i)
