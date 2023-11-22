@@ -4,3 +4,7 @@
    cp -R cmake-3.20.4-linux-x86_64 /usr/local/cmake
 4 创建软连接
     ln -sf /usr/local/cmake/bin/* /usr/bin/
+
+
+通过sh文件安装cmake
+sh cmake-3.12.0-Linux-x86_64.sh --prefix=/usr/local --exclude-subdir
