@@ -18,10 +18,13 @@ int main()
                                                 // 硬件时间
     system_clock::time_point time_st_system_ = system_clock::now();  
                                                 // 系统时间
-    for (int i=0; i<1000000; i++)
-        {
-            int j = 1;
-        }
+    const int cycle{1000000};
+    for (int i=0; i<cycle; i++)
+    {
+        // steady_clock::time_point clock = steady_clock::now();
+        system_clock::time_point clock = std::chrono::high_resolution_clock::now();
+        // clock = system_clock::now(); 
+    }
 
     steady_clock::time_point time_ed = steady_clock::now();
     system_clock::time_point time_ed_system_ = system_clock::now();
@@ -43,11 +46,14 @@ int main()
     cout << "program used clock cycle(ns): " << d1.count() << endl;
     cout << "program used clock cycle(ns): " << d2.count() << endl;
     cout << "program used clock cycle(ns): " << d3.count() << endl;
+    cout << "program average used clock cycle(ns): " << d3.count() / cycle << endl;
     
     cout << "program used clock cycle(us): " << duration_cast<microseconds>(d1).count() << endl;
     cout << "program used clock cycle(ms): " << duration_cast<milliseconds>(d1).count() << endl;
     cout << "program used clock cycle(s) : " << duration_cast<seconds>(d1).count() << endl;
 
-    system_clock::time_point time_st_system = system_clock::now();
-
+    system_clock::time_point now = system_clock::now();
+    std::time_t time = std::chrono::system_clock::to_time_t(now);
+    std::cout << "Current time: " << std::ctime(&time) << std::endl;
+    return 0;
 }

@@ -32,5 +32,15 @@ int main()
     sprintf(s, "%d, %s, %.2lf\n", 122, "sdqdq", 265.32);
     uint64_t time_ed = GetCurrentCycle();
     printf("sprintf use %lu Cycle %luns 1us=%luCycle\n", time_ed-time_st, (time_ed-time_st) * 1000 / CyclePerUSec, CyclePerUSec);
+
+    // 系统时间
+    time_st = GetCurrentCycle();
+    const int count{1000000};
+    for (int i=0; i<count; i++)
+    {
+        GetCurrentCycle();
+    }
+    time_ed = GetCurrentCycle();
+    printf("%d GetCurrentCycle use %lu Cycle Average %lu Cycle %.3lfns\n", count, time_ed-time_st, (time_ed-time_st)*1000.0 / CyclePerUSec / count);
     return 0;
 }
