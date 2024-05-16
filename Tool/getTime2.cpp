@@ -22,8 +22,8 @@ int main()
     for (int i=0; i<cycle; i++)
     {
         // steady_clock::time_point clock = steady_clock::now();
-        system_clock::time_point clock = std::chrono::high_resolution_clock::now();
-        // clock = system_clock::now(); 
+        // system_clock::time_point clock = std::chrono::high_resolution_clock::now();
+        system_clock::time_point clock = system_clock::now(); 
     }
 
     steady_clock::time_point time_ed = steady_clock::now();
@@ -54,6 +54,10 @@ int main()
 
     system_clock::time_point now = system_clock::now();
     std::time_t time = std::chrono::system_clock::to_time_t(now);
-    std::cout << "Current time: " << std::ctime(&time) << std::endl;
+    std::tm* now_tm = std::localtime(&time);
+    std::cout << "Current time: " << std::ctime(&time) << "ns" << std::endl;
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", now_tm);
+    std::cout << "Current time: " << buffer << "." << now.time_since_epoch().count() % 1000000000 << std::endl;
     return 0;
 }

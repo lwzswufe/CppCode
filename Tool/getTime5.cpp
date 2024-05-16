@@ -56,6 +56,7 @@ int main(void)
         GetSysUsecTime();
     }
     int time_ed = GetSysUsecTime();
-    printf("%d GetSysUsecTime use %.3lfs average:%.3lfus", cycle, (time_ed-time_st) / 1000000.0, (time_ed-time_st) * 1.0 / cycle );
+    printf("%d GetSysUsecTime use total %.3lfs average:%.3lfus\n", cycle, 
+            (time_ed-time_st) / 1000000.0, (time_ed-time_st) * 1.0 / cycle );
     return 0; 
 }  
